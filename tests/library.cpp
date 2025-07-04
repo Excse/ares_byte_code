@@ -4,10 +4,11 @@
 #include <iostream>
 #include <chrono>
 
+#include "aresbc/field_info.h"
 #include "aresbc/vm_check.h"
 #include "aresbc/utils.h"
 
-using namespace ares;
+using namespace aresbc;
 
 TEST(General, Works) {
     auto start = std::chrono::high_resolution_clock::now();

@@ -28,14 +28,8 @@ include(FetchContent)              # For downloading and using external dependen
 ### --- LibZip --- ###
 set(LIBZIP_DO_INSTALL OFF CACHE BOOL "Disable install for libzip")
 set(BUILD_REGRESS OFF CACHE BOOL "Disable regression tests")
-
-# Download and make LibZip available
-FetchContent_Declare(
-        libzip
-        GIT_REPOSITORY https://github.com/nih-at/libzip.git
-        GIT_TAG main
-)
-FetchContent_MakeAvailable(libzip)
+# You need to have libzip installed. E.g. via sudo apt-get install libzip-dev
+find_package(libzip CONFIG REQUIRED)
 
 ### --- Boost --- ###
 # You need to have boost installed. E.g. via sudo apt-get install libboost-all-dev
@@ -57,7 +51,7 @@ add_library(${PROJECT_NAME}
 # Create an alias for the library: your_project::your_project
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 # Link both boost and libzip to the library
-target_link_libraries(${PROJECT_NAME} zip Boost::boost)
+target_link_libraries(${PROJECT_NAME} PRIVATE zip Boost::boost)
 
 # Setup include directories for consumers and installers
 target_include_directories(
