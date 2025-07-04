@@ -150,7 +150,7 @@ void VMCheck::visit_class_field(ClassFile &class_file, FieldInfo &field_info) {
     }
 
     for (auto &attribute : field_info.attributes)
-        VMCheck::visit_field_attribute(class_file, field_info, *attribute);
+        VMCheck::visit_field_attribute(class_file, field_info, attribute);
 }
 
 // TODO: Do checks for the descriptor_index in

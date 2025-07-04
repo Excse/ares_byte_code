@@ -243,10 +243,10 @@ void ClassReader::visit_class_field(ClassFile &class_file, FieldInfo &field_info
 void ClassReader::read_field_attributes(ClassFile &class_file, FieldInfo &field_info) {
     CHECKED_READ(u16, field_info.attributes_count, "Couldn't read the attribute count.")
 
-    field_info.attributes = std::vector<std::shared_ptr<AttributeInfo>>(field_info.attributes_count);
+    field_info.attributes = std::vector<AttributeInfo>(field_info.attributes_count);
 
     for (auto &attribute_info: field_info.attributes) {
-        ClassReader::visit_field_attribute(class_file, field_info, *attribute_info);
+        ClassReader::visit_field_attribute(class_file, field_info, attribute_info);
     }
 }
 

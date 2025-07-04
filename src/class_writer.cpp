@@ -115,8 +115,8 @@ void ClassWriter::visit_class_field(ClassFile &class_file,
     write_u16(field_info.descriptor_index, class_file);
 
     write_u16(field_info.attributes_count, class_file);
-    for (const auto &attribute_info : field_info.attributes)
-        ClassWriter::visit_field_attribute(class_file, field_info, *attribute_info);
+    for (auto &attribute_info : field_info.attributes)
+        ClassWriter::visit_field_attribute(class_file, field_info, attribute_info);
 }
 
 void ClassWriter::visit_class_method(ClassFile &class_file, MethodInfo &method_info) {
