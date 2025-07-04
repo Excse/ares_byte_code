@@ -4,12 +4,11 @@
 #include "constant_info.h"
 #include "method_info.h"
 #include "class_file.h"
-#include "field_info.h"
 #include "visitor.h"
 
-namespace ares {
+namespace aresbc {
 
-class VMCheck : Visitor {
+class VMCheck final : Visitor {
 public:
     void visit_class(ClassFile &class_file) override;
 
@@ -27,9 +26,9 @@ public:
 
     void visit_method_attribute(ClassFile &class_file, MethodInfo &method_info, AttributeInfo &attribute_info) override;
 
-    static void visit_class_info(ares::ClassFile &class_file, ares::ConstantInfo::ClassInfo &info);
+    static void visit_class_info(aresbc::ClassFile &class_file, aresbc::ConstantInfo::ClassInfo &info);
 
-    static void visit_field_method_info(ares::ClassFile &class_file, ConstantInfo::FieldMethodInfo &info);
+    static void visit_field_method_info(aresbc::ClassFile &class_file, ConstantInfo::FieldMethodInfo &info);
 
     static void visit_name_and_type_info(ClassFile &class_file, ConstantInfo::NameAndTypeInfo &info);
 

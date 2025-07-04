@@ -1,39 +1,39 @@
 #pragma once
 
-#include <unordered_map>
-#include <string>
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include <zip.h>
+namespace aresbc {
 
-#include "class_file.h"
+struct AttributeInfo;
 
-namespace ares {
-
-class Manifest {
-public:
-    static auto read_manifest(std::string &content) -> Manifest;
-
-    [[nodiscard]] auto content() const -> std::string;
-
-public:
-    std::unordered_map <std::string, std::string> data{};
+union AttributeType {
+    struct ExceptionEntry {
+        uint16_t start_pc;
+        uint16_t end_pc;
+        uint16_t handler_pc;
+        uint16_t catch_type;
+    };
+    struct Code {
+        uint16_t max_stack;
+        uint16_t max_locals;
+        uint32_t code_length;
+        std::vector <uint8_t> code;
+        uint16_t exception_table_length;
+        std::vector <ExceptionEntry> exception_table;
+        uint16_t attributes_count;
+        std::vector <AttributeInfo> attributes;
+    };
 };
 
-class JARFile {
+struct AttributeInfo {
 public:
-    static auto read_file(const std::string &path) -> JARFile;
-
-    auto write_file(const std::string &path) -> void;
-
-private:
-    static void _add_to_zip(zip_t *zip, const std::string &file_name, const std::vector<uint8_t> &data);
+    [[nodiscard]] auto size() const -> unsigned int;
 
 public:
-    std::unordered_map <std::string, std::vector<uint8_t>> others{};
-    std::unordered_map <std::string, ClassFile> classes{};
-    Manifest manifest{};
+    uint16_t attribute_name_index{};
+    uint32_t attribute_length{};
+    uint8_t *info{};
 };
 
 } // namespace ares

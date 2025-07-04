@@ -1,13 +1,9 @@
 #pragma once
 
-#include <unordered_map>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <memory>
 #include <vector>
-#include <list>
 
-namespace ares {
+namespace aresbc {
 
 struct AttributeInfo;
 

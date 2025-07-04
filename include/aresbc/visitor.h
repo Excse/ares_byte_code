@@ -1,19 +1,33 @@
-#include "aresbc/field_info.h"
+#pragma once
 
-#include "aresbc/attribute_info.h"
+#include "attribute_info.h"
+#include "method_info.h"
+#include "class_file.h"
 
-using namespace aresbc;
+namespace aresbc {
 
-auto FieldInfo::has_access_flag(AccessFlag access_flag) const -> bool {
-    return access_flags & access_flag;
-}
+class Visitor {
+public:
+    virtual ~Visitor() = default;
 
-auto FieldInfo::size() const -> unsigned int {
-    size_t size = 8;
-    for(const auto &attribute : attributes)
-        size += attribute.size();
-    return size;
-}
+    virtual void visit_class(ClassFile &class_file) = 0;
+
+    virtual void visit_classpool_info(ClassFile &class_file, ConstantPoolInfo &constantPoolInfo) = 0;
+
+    virtual void visit_class_interface(ClassFile &class_file, uint16_t interface) = 0;
+
+    virtual void visit_class_field(ClassFile &class_file, FieldInfo &field_info) = 0;
+
+    virtual void visit_class_method(ClassFile &class_file, MethodInfo &method_info) = 0;
+
+    virtual void visit_class_attribute(ClassFile &class_file, AttributeInfo &attribute_info) = 0;
+
+    virtual void visit_field_attribute(ClassFile &class_file, FieldInfo &field_info, AttributeInfo &attribute_info) = 0;
+
+    virtual void visit_method_attribute(ClassFile &class_file, MethodInfo &method_info, AttributeInfo &attribute_info) = 0;
+};
+
+} // namespace ares
 
 //==============================================================================
 // BSD 3-Clause License

@@ -1,48 +1,31 @@
-#pragma once
+#include "gtest/gtest.h"
 
-#include <unordered_map>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <memory>
-#include <vector>
-#include <list>
+#include <algorithm>
+#include <iostream>
+#include <chrono>
 
-namespace ares {
+#include "aresbc/vm_check.h"
+#include "aresbc/utils.h"
 
-struct AttributeInfo;
+using namespace ares;
 
-union AttributeType {
-    struct ExceptionEntry {
-        uint16_t start_pc;
-        uint16_t end_pc;
-        uint16_t handler_pc;
-        uint16_t catch_type;
-    };
-    struct Code {
-        uint16_t max_stack;
-        uint16_t max_locals;
-        uint32_t code_length;
-        std::vector <uint8_t> code;
-        uint16_t exception_table_length;
-        std::vector <ExceptionEntry> exception_table;
-        uint16_t attributes_count;
-        std::vector <AttributeInfo> attributes;
-    };
-};
+TEST(General, Works) {
+    auto start = std::chrono::high_resolution_clock::now();
 
-struct AttributeInfo {
-public:
-    [[nodiscard]] auto size() const -> unsigned int;
+    auto file = JARFile::read_file(TEST_PATH "/resources/hello_world_in.jar");
 
-public:
-    uint16_t attribute_name_index{};
-    uint32_t attribute_length{};
-    uint8_t *info{};
-};
+    VMCheck vmCheck;
+    for (auto &class_file: file.classes) {
+        vmCheck.visit_class(class_file.second);
+    }
 
-} // namespace ares
+    file.write_file(TEST_PATH "/resources/hello_world_out.jar");
 
-//==============================================================================
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Time taken: " << duration.count() << "µs" << std::endl;
+}
+
 // BSD 3-Clause License
 //
 // Copyright (c) 2025, Timo Behrend
@@ -71,5 +54,3 @@ public:
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//==============================================================================

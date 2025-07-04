@@ -1,6 +1,6 @@
-#include "attribute_info.h"
+#include "aresbc/attribute_info.h"
 
-using namespace ares;
+using namespace aresbc;
 
 auto AttributeInfo::size() const -> unsigned int {
     return 6 + attribute_length;

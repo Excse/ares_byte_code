@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "aresbc/utils.h"
 
 #include <filesystem>
 #include <algorithm>
@@ -6,10 +6,11 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "class_reader.h"
-#include "class_writer.h"
+#include "aresbc/class_reader.h"
+#include "aresbc/class_writer.h"
+#include "aresbc/field_info.h"
 
-using namespace ares;
+using namespace aresbc;
 
 auto Manifest::content() const -> std::string {
     std::stringstream content;

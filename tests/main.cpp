@@ -1,29 +1,8 @@
-#include <algorithm>
-#include <iostream>
-#include <chrono>
-
 #include "gtest/gtest.h"
 
-#include "vm_check.h"
-#include "utils.h"
-
-using namespace ares;
-
-TEST(General, Works) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    auto file = JARFile::read_file(TEST_PATH "/resources/hello_world_in.jar");
-
-    VMCheck vmCheck;
-    for (auto &class_file: file.classes) {
-        vmCheck.visit_class(class_file.second);
-    }
-
-    file.write_file(TEST_PATH "/resources/hello_world_out.jar");
-
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "Time taken: " << duration.count() << "µs" << std::endl;
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
 
 //==============================================================================

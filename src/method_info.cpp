@@ -1,8 +1,8 @@
-#include "method_info.h"
+#include "aresbc/method_info.h"
 
-#include "attribute_info.h"
+#include "aresbc/attribute_info.h"
 
-using namespace ares;
+using namespace aresbc;
 
 auto MethodInfo::has_access_flag(AccessFlag access_flag) const -> bool {
     return access_flags & access_flag;

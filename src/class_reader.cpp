@@ -1,10 +1,11 @@
-#include "class_reader.h"
+#include "aresbc/class_reader.h"
 
 #include <iostream>
 
-#include "utils.h"
+#include "aresbc/field_info.h"
+#include "aresbc/utils.h"
 
-using namespace ares;
+using namespace aresbc;
 
 #define CHECKED_READ(size, target, error_message)           \
     if(!ClassReader::read_##size(target, class_file)) {     \

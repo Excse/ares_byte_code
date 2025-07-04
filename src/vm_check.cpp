@@ -1,8 +1,10 @@
-#include "vm_check.h"
+#include "aresbc/vm_check.h"
 
 #include <iostream>
 
-using namespace ares;
+#include "aresbc/field_info.h"
+
+using namespace aresbc;
 
 void VMCheck::visit_class(ClassFile &class_file) {
     if (class_file.magic_number != 0xCAFEBABE) {

@@ -1,11 +1,12 @@
-#include "class_writer.h"
+#include "aresbc/class_writer.h"
 
 #include <iostream>
 
-#include "constant_info.h"
-#include "utils.h"
+#include "aresbc/constant_info.h"
+#include "aresbc/field_info.h"
+#include "aresbc/utils.h"
 
-using namespace ares;
+using namespace aresbc;
 
 ClassWriter::ClassWriter(unsigned int offset) : _offset(offset) {}
 

@@ -1,11 +1,11 @@
-#include "class_file.h"
+#include "aresbc/class_file.h"
 
-#include "attribute_info.h"
-#include "constant_info.h"
-#include "method_info.h"
-#include "field_info.h"
+#include "aresbc/attribute_info.h"
+#include "aresbc/constant_info.h"
+#include "aresbc/method_info.h"
+#include "aresbc/field_info.h"
 
-using namespace ares;
+using namespace aresbc;
 
 auto ClassFile::is_valid_index(unsigned int index) const -> bool {
     return index > 0 && index < constant_pool_count;

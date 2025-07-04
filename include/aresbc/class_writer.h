@@ -1,43 +1,45 @@
 #pragma once
 
-#include <unordered_map>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <memory>
-#include <vector>
-#include <list>
+#include "visitor.h"
 
-namespace ares {
+namespace aresbc {
 
-struct AttributeInfo;
-
-class ClassFile;
-
-class FieldInfo {
+class ClassWriter final : Visitor {
 public:
-    enum AccessFlag : uint16_t {
-        PUBLIC = 0x0001,
-        PRIVATE = 0x0002,
-        PROTECTED = 0x0004,
-        STATIC = 0x0008,
-        FINAL = 0x0010,
-        VOLATILE = 0x0040,
-        TRANSIENT = 0x0080,
-        SYNTHETIC = 0x1000,
-        ENUM = 0x4000,
-    };
+    explicit ClassWriter(unsigned int offset = 0);
 
 public:
-    [[nodiscard]] auto has_access_flag(AccessFlag access_flag) const -> bool;
+    void visit_class(ClassFile &class_info) override;
 
-    [[nodiscard]] auto size() const -> unsigned int;
+    [[nodiscard]] auto byte_code() const -> const std::vector<uint8_t > &;
 
-public:
-    uint16_t access_flags{};
-    uint16_t name_index{};
-    uint16_t descriptor_index{};
-    uint16_t attributes_count{};
-    std::vector <AttributeInfo> attributes{};
+private:
+    void visit_classpool_info(ClassFile &class_info, ConstantPoolInfo &info) override;
+
+    void visit_class_interface(ClassFile &class_info, uint16_t interface) override;
+
+    void visit_class_field(ClassFile &class_info, FieldInfo &field_info) override;
+
+    void visit_class_method(ClassFile &class_info, MethodInfo &method_info) override;
+
+    void visit_class_attribute(ClassFile &class_info, AttributeInfo &attribute_info) override;
+
+    void visit_field_attribute(ClassFile &class_info, FieldInfo &field_info, AttributeInfo &attribute_info) override;
+
+    void visit_method_attribute(ClassFile &class_info, MethodInfo &method_info, AttributeInfo &attribute_info) override;
+
+private:
+    auto write_u8(uint8_t & data, ClassFile &class_file) -> bool;
+
+    auto write_u32(uint32_t & data, ClassFile &class_file) -> bool;
+
+    auto write_u16(uint16_t & data, ClassFile &class_file) -> bool;
+
+    auto write_u8_array(uint8_t *data, unsigned int data_size, ClassFile &class_file) -> bool;
+
+private:
+    unsigned int _offset{}, _size{};
+    std::vector<uint8_t> _byte_code{};
 };
 
 } // namespace ares

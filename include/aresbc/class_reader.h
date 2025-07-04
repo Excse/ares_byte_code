@@ -1,20 +1,15 @@
 #pragma once
 
-#include <unordered_map>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <memory>
-#include <vector>
-#include <list>
 
 #include "attribute_info.h"
 #include "constant_info.h"
 #include "class_file.h"
 #include "visitor.h"
 
-namespace ares {
+namespace aresbc {
 
-class ClassReader : Visitor {
+class ClassReader final : Visitor {
 public:
     explicit ClassReader(unsigned int offset = 0u);
 

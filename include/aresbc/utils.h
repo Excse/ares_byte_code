@@ -1,29 +1,39 @@
 #pragma once
 
-#include "attribute_info.h"
-#include "method_info.h"
-#include "field_info.h"
+#include <unordered_map>
+#include <string>
+#include <vector>
+#include <memory>
+
+#include <zip.h>
+
 #include "class_file.h"
 
-namespace ares {
+namespace aresbc {
 
-class Visitor {
+class Manifest {
 public:
-    virtual void visit_class(ClassFile &class_file) = 0;
+    static auto read_manifest(std::string &content) -> Manifest;
 
-    virtual void visit_classpool_info(ClassFile &class_file, ConstantPoolInfo &constantPoolInfo) = 0;
+    [[nodiscard]] auto content() const -> std::string;
 
-    virtual void visit_class_interface(ClassFile &class_file, uint16_t interface) = 0;
+public:
+    std::unordered_map <std::string, std::string> data{};
+};
 
-    virtual void visit_class_field(ClassFile &class_file, FieldInfo &field_info) = 0;
+class JARFile {
+public:
+    static auto read_file(const std::string &path) -> JARFile;
 
-    virtual void visit_class_method(ClassFile &class_file, MethodInfo &method_info) = 0;
+    auto write_file(const std::string &path) -> void;
 
-    virtual void visit_class_attribute(ClassFile &class_file, AttributeInfo &attribute_info) = 0;
+private:
+    static void _add_to_zip(zip_t *zip, const std::string &file_name, const std::vector<uint8_t> &data);
 
-    virtual void visit_field_attribute(ClassFile &class_file, FieldInfo &field_info, AttributeInfo &attribute_info) = 0;
-
-    virtual void visit_method_attribute(ClassFile &class_file, MethodInfo &method_info, AttributeInfo &attribute_info) = 0;
+public:
+    std::unordered_map <std::string, std::vector<uint8_t>> others{};
+    std::unordered_map <std::string, ClassFile> classes{};
+    Manifest manifest{};
 };
 
 } // namespace ares
