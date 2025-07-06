@@ -1,0 +1,35 @@
+name: CMake on a single platform
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+  BUILD_SHARED_LIBS: ON
+  MAKE_INSTALLABLE: OFF
+  BUILD_EXECUTABLE: ON
+  BUILD_TESTING: ON
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: sudo apt-get update && sudo apt-get install -y cmake ninja-build libzip-dev libboost-all-dev
+      
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -G Ninja -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTING=${{env.BUILD_TESTING}} -DBUILD_EXECUTABLE=${{env.BUILD_EXECUTABLE}} -DMAKE_INSTALLABLE=${{env.MAKE_INSTALLABLE}} -DBUILD_SHARED_LIBS=${{env.BUILD_SHARED_LIBS}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -- -j2
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
