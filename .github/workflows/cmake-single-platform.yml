@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install Dependencies
-      run: sudo apt-get update && sudo apt-get install -y cmake ninja-build libzip-dev libzip-tools libboost-all-dev
+      run: sudo apt-get update && sudo apt-get install -y cmake ninja-build libzip-dev zip libboost-all-dev
       
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -G Ninja -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTING=${{env.BUILD_TESTING}} -DBUILD_EXECUTABLE=${{env.BUILD_EXECUTABLE}} -DMAKE_INSTALLABLE=${{env.MAKE_INSTALLABLE}} -DBUILD_SHARED_LIBS=${{env.BUILD_SHARED_LIBS}}
