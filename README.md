@@ -17,7 +17,7 @@ official JVM documentation.
 
 Download the project or use git to clone it:
 ```sh
-$ git clone https://github.com/Excse/AresByteCode.git
+$ git clone https://github.com/Excse/ares_byte_code
 ```
 
 Navigate to the directory where the project is located and execute these commands:
