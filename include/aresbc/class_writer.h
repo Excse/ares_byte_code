@@ -9,33 +9,33 @@ public:
     explicit ClassWriter(unsigned int offset = 0);
 
 public:
-    void visit_class(ClassFile &class_info) override;
+    void visit_class(ClassFile& class_info) override;
 
-    [[nodiscard]] auto byte_code() const -> const std::vector<uint8_t > &;
-
-private:
-    void visit_classpool_info(ClassFile &class_info, ConstantPoolInfo &info) override;
-
-    void visit_class_interface(ClassFile &class_info, uint16_t interface) override;
-
-    void visit_class_field(ClassFile &class_info, FieldInfo &field_info) override;
-
-    void visit_class_method(ClassFile &class_info, MethodInfo &method_info) override;
-
-    void visit_class_attribute(ClassFile &class_info, AttributeInfo &attribute_info) override;
-
-    void visit_field_attribute(ClassFile &class_info, FieldInfo &field_info, AttributeInfo &attribute_info) override;
-
-    void visit_method_attribute(ClassFile &class_info, MethodInfo &method_info, AttributeInfo &attribute_info) override;
+    [[nodiscard]] auto byte_code() const -> const std::vector<uint8_t>&;
 
 private:
-    auto write_u8(uint8_t & data, ClassFile &class_file) -> bool;
+    void visit_classpool_info(ClassFile& class_info, ConstantPoolInfo& info) override;
 
-    auto write_u32(uint32_t & data, ClassFile &class_file) -> bool;
+    void visit_class_interface(ClassFile& class_info, uint16_t interface) override;
 
-    auto write_u16(uint16_t & data, ClassFile &class_file) -> bool;
+    void visit_class_field(ClassFile& class_info, FieldInfo& field_info) override;
 
-    auto write_u8_array(uint8_t *data, unsigned int data_size, ClassFile &class_file) -> bool;
+    void visit_class_method(ClassFile& class_info, MethodInfo& method_info) override;
+
+    void visit_class_attribute(ClassFile& class_info, AttributeInfo& attribute_info) override;
+
+    void visit_field_attribute(ClassFile& class_info, FieldInfo& field_info, AttributeInfo& attribute_info) override;
+
+    void visit_method_attribute(ClassFile& class_info, MethodInfo& method_info, AttributeInfo& attribute_info) override;
+
+private:
+    auto write_u8(uint8_t& data, ClassFile& class_file) -> bool;
+
+    auto write_u32(uint32_t& data, ClassFile& class_file) -> bool;
+
+    auto write_u16(uint16_t& data, ClassFile& class_file) -> bool;
+
+    auto write_u8_array(uint8_t* data, unsigned int data_size, ClassFile& class_file) -> bool;
 
 private:
     unsigned int _offset{}, _size{};

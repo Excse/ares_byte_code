@@ -14,13 +14,13 @@ using namespace aresbc;
 
 auto Manifest::content() const -> std::string {
     std::stringstream content;
-    for (const auto & [key, value]: data) {
+    for (const auto& [key, value] : data) {
         content << key << ": " << value << std::endl;
     }
     return content.str();
 }
 
-auto Manifest::read_manifest(std::string &content) -> Manifest {
+auto Manifest::read_manifest(std::string& content) -> Manifest {
     std::istringstream stream(content);
     std::string line;
 
@@ -45,13 +45,13 @@ auto Manifest::read_manifest(std::string &content) -> Manifest {
     return manifest;
 }
 
-auto JARFile::read_file(const std::filesystem::path &path) -> JARFile {
+auto JARFile::read_file(const std::filesystem::path& path) -> JARFile {
     if (path.extension() != ".jar") {
         throw std::invalid_argument("Warning: You can only enter \".jar\" files.");
     }
 
     int error = 0;
-    zip_t *zip = zip_open(path.c_str(), 0, &error);
+    zip_t* zip = zip_open(path.c_str(), 0, &error);
 
     if (!zip) {
         zip_error_t zip_error;
@@ -66,7 +66,7 @@ auto JARFile::read_file(const std::filesystem::path &path) -> JARFile {
 
     zip_int64_t entries = zip_get_num_entries(zip, 0);
     for (zip_int64_t index = 0; index < entries; index++) {
-        const char *file_name = zip_get_name(zip, index, 0);
+        const char* file_name = zip_get_name(zip, index, 0);
         if (!file_name) continue;
 
         std::string name(file_name);
@@ -78,7 +78,7 @@ auto JARFile::read_file(const std::filesystem::path &path) -> JARFile {
         }
 
         auto data = std::vector<uint8_t>(stat.size);
-        zip_file_t *file = zip_fopen(zip, name.c_str(), 0);
+        zip_file_t* file = zip_fopen(zip, name.c_str(), 0);
         if (!file) {
             throw std::runtime_error("Warning: Failed to open file in ZIP: " + name);
         }
@@ -91,7 +91,7 @@ auto JARFile::read_file(const std::filesystem::path &path) -> JARFile {
         }
 
         if (name == "META-INF/MANIFEST.MF") {
-            auto content = std::string(reinterpret_cast<char *>(data.data()), stat.size);
+            auto content = std::string(reinterpret_cast<char*>(data.data()), stat.size);
             jar_file.manifest = Manifest::read_manifest(content);
         } else if (name.ends_with(".class")) {
             ClassFile class_file;
@@ -112,7 +112,7 @@ auto JARFile::read_file(const std::filesystem::path &path) -> JARFile {
     return jar_file;
 }
 
-auto JARFile::write_file(const std::filesystem::path &path) -> void {
+auto JARFile::write_file(const std::filesystem::path& path) -> void {
     if (path.extension() != ".jar") {
         throw std::runtime_error("Warning: You can only enter \".jar\" files.");
     }
@@ -122,7 +122,7 @@ auto JARFile::write_file(const std::filesystem::path &path) -> void {
     }
 
     int error = 0;
-    zip_t *zip = zip_open(path.c_str(), ZIP_CREATE | ZIP_TRUNCATE, &error);
+    zip_t* zip = zip_open(path.c_str(), ZIP_CREATE | ZIP_TRUNCATE, &error);
 
     if (!zip) {
         zip_error_t zip_error;
@@ -133,15 +133,15 @@ auto JARFile::write_file(const std::filesystem::path &path) -> void {
         throw std::runtime_error("Warning: Couldn't create the ZIP File: " + error_message);
     }
 
-    for (auto & [file_name, data]: classes) {
+    for (auto& [file_name, data] : classes) {
         ClassWriter writer;
         writer.visit_class(data);
 
-        auto &byte_code = writer.byte_code();
+        auto& byte_code = writer.byte_code();
         _add_to_zip(zip, file_name, byte_code);
     }
 
-    for (auto & [file_name, data]: others) {
+    for (auto& [file_name, data] : others) {
         _add_to_zip(zip, file_name, data);
     }
 
@@ -155,15 +155,15 @@ auto JARFile::write_file(const std::filesystem::path &path) -> void {
     }
 }
 
-void JARFile::_add_to_zip(zip_t *zip, const std::string &file_name, const std::vector<uint8_t> &data) {
+void JARFile::_add_to_zip(zip_t* zip, const std::string& file_name, const std::vector<uint8_t>& data) {
     // Weird workaround. zip_file_add is not directly using the data and instead stores it until zip_close is being called.
     // The problem is that data is not always present (like generating bytecode using ClassWriter in a for loop).
-    auto *data_copy = new uint8_t[data.size()];
+    auto* data_copy = new uint8_t[data.size()];
     if (!data.empty()) {
         std::memcpy(data_copy, data.data(), data.size());
     }
 
-    zip_source_t *source = zip_source_buffer(zip, data_copy, data.size(), 0);
+    zip_source_t* source = zip_source_buffer(zip, data_copy, data.size(), 0);
     if (!source) {
         const std::string error_message = zip_strerror(zip);
         throw std::runtime_error("Warning: Error creating source: " + error_message);

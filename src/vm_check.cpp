@@ -6,15 +6,14 @@
 
 using namespace aresbc;
 
-void VMCheck::visit_class(ClassFile &class_file) {
+void VMCheck::visit_class(ClassFile& class_file) {
     if (class_file.magic_number != 0xCAFEBABE) {
         std::cerr << "The magic number doesn't match \"0xCAFEBABE\"." << std::endl;
         abort();
     }
 
     if (class_file.class_version == ClassFile::UNDEFINED) {
-        std::cerr << "Couldn't set the class file version because it is an undefined value."
-                  << std::endl;
+        std::cerr << "Couldn't set the class file version because it is an undefined value." << std::endl;
         abort();
     }
 
@@ -24,8 +23,9 @@ void VMCheck::visit_class(ClassFile &class_file) {
         abort();
     }
 
-    for (auto &constantPoolInfo : class_file.constant_pool)
+    for (auto& constantPoolInfo : class_file.constant_pool) {
         VMCheck::visit_classpool_info(class_file, constantPoolInfo);
+    }
 
     if (class_file.has_access_flag(ClassFile::INTERFACE)) {
         if (!class_file.has_access_flag(ClassFile::ABSTRACT)
@@ -64,8 +64,7 @@ void VMCheck::visit_class(ClassFile &class_file) {
 
     if (class_file.super_class != 0) {
         if (!class_file.is_valid_index(class_file.super_class)) {
-            std::cerr << "The \"super class\" index is not a valid constant pool index."
-                      << std::endl;
+            std::cerr << "The \"super class\" index is not a valid constant pool index." << std::endl;
             abort();
         }
 
@@ -76,20 +75,24 @@ void VMCheck::visit_class(ClassFile &class_file) {
         }
     }
 
-    for (auto &interface : class_file.interfaces)
+    for (auto& interface : class_file.interfaces) {
         VMCheck::visit_class_interface(class_file, interface);
+    }
 
-    for (auto &field_info : class_file.fields)
+    for (auto& field_info : class_file.fields) {
         VMCheck::visit_class_field(class_file, field_info);
+    }
 
-    for (auto &method_info : class_file.methods)
+    for (auto& method_info : class_file.methods) {
         VMCheck::visit_class_method(class_file, method_info);
+    }
 
-    for (auto &attribute_info : class_file.attributes)
+    for (auto& attribute_info : class_file.attributes) {
         VMCheck::visit_class_attribute(class_file, attribute_info);
+    }
 }
 
-void VMCheck::visit_class_interface(ClassFile &class_file, uint16_t interface) {
+void VMCheck::visit_class_interface(ClassFile& class_file, uint16_t interface) {
     if (!class_file.is_valid_index(interface)) {
         std::cerr << "The interface index is not a valid constant pool index." << std::endl;
         abort();
@@ -102,7 +105,7 @@ void VMCheck::visit_class_interface(ClassFile &class_file, uint16_t interface) {
     }
 }
 
-void VMCheck::visit_class_field(ClassFile &class_file, FieldInfo &field_info) {
+void VMCheck::visit_class_field(ClassFile& class_file, FieldInfo& field_info) {
     if (field_info.has_access_flag(FieldInfo::PUBLIC)) {
         if (field_info.has_access_flag(FieldInfo::PRIVATE) || field_info.has_access_flag(FieldInfo::PROTECTED)) {
             std::cerr << "The field has invalid public access flags." << std::endl;
@@ -123,8 +126,7 @@ void VMCheck::visit_class_field(ClassFile &class_file, FieldInfo &field_info) {
     if (class_file.has_access_flag(ClassFile::INTERFACE)) {
         if (!field_info.has_access_flag(FieldInfo::PUBLIC) || !field_info.has_access_flag(FieldInfo::STATIC)
             || !field_info.has_access_flag(FieldInfo::FINAL)) {
-            std::cerr << "Fields of interfaces need to have public, static and final access "
-                         "modifier set." << std::endl;
+            std::cerr << "Fields of interfaces need to have public, static and final access modifier set." << std::endl;
             abort();
         }
     }
@@ -151,13 +153,14 @@ void VMCheck::visit_class_field(ClassFile &class_file, FieldInfo &field_info) {
         abort();
     }
 
-    for (auto &attribute : field_info.attributes)
+    for (auto& attribute : field_info.attributes) {
         VMCheck::visit_field_attribute(class_file, field_info, attribute);
+    }
 }
 
 // TODO: Do checks for the descriptor_index in
 //  https://docs.oracle.com/javase/specs/jvms/se15/html/jvms-4.html#jvms-4.6
-void VMCheck::visit_class_method(ClassFile &class_file, MethodInfo &method_info) {
+void VMCheck::visit_class_method(ClassFile& class_file, MethodInfo& method_info) {
     if (method_info.has_access_flag(MethodInfo::PUBLIC)) {
         if (method_info.has_access_flag(MethodInfo::PRIVATE)
             || method_info.has_access_flag(MethodInfo::PROTECTED)) {
@@ -190,15 +193,13 @@ void VMCheck::visit_class_method(ClassFile &class_file, MethodInfo &method_info)
         if (class_file.class_version < ClassFile::VERSION_8) {
             if (!method_info.has_access_flag(MethodInfo::PUBLIC)
                 || !method_info.has_access_flag(MethodInfo::ABSTRACT)) {
-                std::cerr << "The access flags for an interface methods are invalid."
-                          << std::endl;
+                std::cerr << "The access flags for an interface methods are invalid." << std::endl;
                 abort();
             }
         } else if (class_file.class_version >= ClassFile::VERSION_8) {
             if (method_info.has_access_flag(MethodInfo::PUBLIC)
                 && method_info.has_access_flag(MethodInfo::PRIVATE)) {
-                std::cerr << "The access flags for an interface methods are invalid."
-                          << std::endl;
+                std::cerr << "The access flags for an interface methods are invalid." << std::endl;
                 abort();
             }
         }
@@ -211,8 +212,7 @@ void VMCheck::visit_class_method(ClassFile &class_file, MethodInfo &method_info)
             || method_info.has_access_flag(MethodInfo::SYNCHRONIZED)
             || method_info.has_access_flag(MethodInfo::NATIVE)
             || method_info.has_access_flag(MethodInfo::STRICT)) {
-            std::cerr << "The access flags for an interface methods are invalid."
-                      << std::endl;
+            std::cerr << "The access flags for an interface methods are invalid." << std::endl;
             abort();
         }
     }
@@ -229,7 +229,7 @@ void VMCheck::visit_class_method(ClassFile &class_file, MethodInfo &method_info)
     }
 
     std::string name;
-    name.assign((char *) methodName.info.utf8_info.bytes, methodName.info.utf8_info.length);
+    name.assign(reinterpret_cast<char*>(methodName.info.utf8_info.bytes), methodName.info.utf8_info.length);
     if (name == "<init>") {
         if (method_info.has_access_flag(MethodInfo::ABSTRACT)
             || method_info.has_access_flag(MethodInfo::NATIVE)
@@ -238,7 +238,7 @@ void VMCheck::visit_class_method(ClassFile &class_file, MethodInfo &method_info)
             || method_info.has_access_flag(MethodInfo::FINAL)
             || method_info.has_access_flag(MethodInfo::STATIC)) {
             std::cerr << "The access flags for an interface methods are invalid."
-                      << std::endl;
+                    << std::endl;
             abort();
         }
     }
@@ -254,11 +254,12 @@ void VMCheck::visit_class_method(ClassFile &class_file, MethodInfo &method_info)
         abort();
     }
 
-    for (auto &attribute_info : method_info.attributes)
+    for (auto& attribute_info : method_info.attributes) {
         VMCheck::visit_method_attribute(class_file, method_info, attribute_info);
+    }
 }
 
-void VMCheck::visit_class_attribute(ClassFile &class_file, AttributeInfo &attribute_info) {
+void VMCheck::visit_class_attribute(ClassFile& class_file, AttributeInfo& attribute_info) {
     if (!class_file.is_valid_index(attribute_info.attribute_name_index)) {
         std::cerr << "The name index is not a valid constant pool index." << std::endl;
         abort();
@@ -271,15 +272,15 @@ void VMCheck::visit_class_attribute(ClassFile &class_file, AttributeInfo &attrib
     }
 }
 
-void VMCheck::visit_field_attribute(ClassFile &class_file, FieldInfo &, AttributeInfo &attribute_info) {
+void VMCheck::visit_field_attribute(ClassFile& class_file, FieldInfo&, AttributeInfo& attribute_info) {
     VMCheck::visit_class_attribute(class_file, attribute_info);
 }
 
-void VMCheck::visit_method_attribute(ClassFile &class_file, MethodInfo &, AttributeInfo &attribute_info) {
+void VMCheck::visit_method_attribute(ClassFile& class_file, MethodInfo&, AttributeInfo& attribute_info) {
     VMCheck::visit_class_attribute(class_file, attribute_info);
 }
 
-void VMCheck::visit_classpool_info(ClassFile &class_file, ConstantPoolInfo &constantPoolInfo) {
+void VMCheck::visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& constantPoolInfo) {
     switch (constantPoolInfo.tag) {
         case ConstantPoolInfo::CLASS: {
             VMCheck::visit_class_info(class_file, constantPoolInfo.info.class_info);
@@ -330,14 +331,14 @@ void VMCheck::visit_classpool_info(ClassFile &class_file, ConstantPoolInfo &cons
     }
 }
 
-void VMCheck::visit_class_info(ClassFile &class_file, ConstantInfo::ClassInfo &info) {
+void VMCheck::visit_class_info(ClassFile& class_file, ConstantInfo::ClassInfo& info) {
     if (!class_file.is_valid_index(info.name_index)) {
         std::cout << "The name index is not a valid constant pool index." << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_field_method_info(ClassFile &class_file, ConstantInfo::FieldMethodInfo &info) {
+void VMCheck::visit_field_method_info(ClassFile& class_file, ConstantInfo::FieldMethodInfo& info) {
     if (!class_file.is_valid_index(info.class_index)) {
         std::cerr << "The class index is not a valid constant pool index." << std::endl;
         abort();
@@ -349,7 +350,7 @@ void VMCheck::visit_field_method_info(ClassFile &class_file, ConstantInfo::Field
     }
 }
 
-void VMCheck::visit_name_and_type_info(ClassFile &class_file, ConstantInfo::NameAndTypeInfo &info) {
+void VMCheck::visit_name_and_type_info(ClassFile& class_file, ConstantInfo::NameAndTypeInfo& info) {
     if (!class_file.is_valid_index(info.name_index)) {
         std::cerr << "The name index is not a valid constant pool index." << std::endl;
         abort();
@@ -361,21 +362,21 @@ void VMCheck::visit_name_and_type_info(ClassFile &class_file, ConstantInfo::Name
     }
 }
 
-void VMCheck::visit_string_info(ClassFile &class_file, ConstantInfo::StringInfo &info) {
+void VMCheck::visit_string_info(ClassFile& class_file, ConstantInfo::StringInfo& info) {
     if (!class_file.is_valid_index(info.string_index)) {
         std::cerr << "The string index is not a valid constant pool index." << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_method_type_info(ClassFile &class_file, ConstantInfo::MethodTypeInfo &info) {
+void VMCheck::visit_method_type_info(ClassFile& class_file, ConstantInfo::MethodTypeInfo& info) {
     if (!class_file.is_valid_index(info.descriptor_index)) {
         std::cerr << "The descriptor index is not a valid constant pool index" << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_method_handle_info(ClassFile &class_file, ConstantInfo::MethodHandleInfo &info) {
+void VMCheck::visit_method_handle_info(ClassFile& class_file, ConstantInfo::MethodHandleInfo& info) {
     if (info.reference_kind < 1 || info.reference_kind > 9) {
         std::cerr << "The reference kind is not in range of 0 to 9." << std::endl;
         abort();
@@ -394,34 +395,29 @@ void VMCheck::visit_method_handle_info(ClassFile &class_file, ConstantInfo::Meth
         || referenceKind == ConstantInfo::MethodHandleKind::PutField
         || referenceKind == ConstantInfo::MethodHandleKind::PutStatic) {
         if (constantPoolInfo.tag != ConstantPoolInfo::FIELD_REF) {
-            std::cerr << "The reference index of the method handle needs to be a field ref."
-                      << std::endl;
+            std::cerr << "The reference index of the method handle needs to be a field ref." << std::endl;
             abort();
         }
     } else if (referenceKind == ConstantInfo::MethodHandleKind::InvokeVirtual
                || referenceKind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
         if (constantPoolInfo.tag != ConstantPoolInfo::FIELD_REF) {
-            std::cerr << "The reference index of the method handle needs to be a method ref."
-                      << std::endl;
+            std::cerr << "The reference index of the method handle needs to be a method ref." << std::endl;
             abort();
         }
     } else if (referenceKind == ConstantInfo::MethodHandleKind::InvokeStatic
                || referenceKind == ConstantInfo::MethodHandleKind::InvokeSpecial) {
         if (class_file.class_version < ClassFile::VERSION_8
             && constantPoolInfo.tag != ConstantPoolInfo::METHOD_REF) {
-            std::cerr << "The reference index of the method handle needs to be a method ref."
-                      << std::endl;
+            std::cerr << "The reference index of the method handle needs to be a method ref." << std::endl;
             abort();
         } else if (constantPoolInfo.tag != ConstantPoolInfo::METHOD_REF
                    && constantPoolInfo.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
-            std::cerr << "The reference index of the method handle needs to be a method ref or "
-                         "interface method ref." << std::endl;
+            std::cerr << "The reference index of the method handle needs to be a method ref or interface method ref." << std::endl;
             abort();
         }
     } else if (referenceKind == ConstantInfo::MethodHandleKind::InvokeInterface) {
         if (constantPoolInfo.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
-            std::cerr << "The reference index of the method handle needs to be a interface method "
-                         "ref." << std::endl;
+            std::cerr << "The reference index of the method handle needs to be a interface method ref." << std::endl;
             abort();
         }
     }
@@ -437,7 +433,7 @@ void VMCheck::visit_method_handle_info(ClassFile &class_file, ConstantInfo::Meth
             nameAndType.info.name_and_type_info.name_index - 1];
 
         std::string name;
-        name.assign((char *) nameUTF8.info.utf8_info.bytes, nameUTF8.info.utf8_info.length);
+        name.assign(reinterpret_cast<char*>(nameUTF8.info.utf8_info.bytes), nameUTF8.info.utf8_info.length);
 
         if (referenceKind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
             if (name != "<init>") {
@@ -446,8 +442,7 @@ void VMCheck::visit_method_handle_info(ClassFile &class_file, ConstantInfo::Meth
             }
         } else {
             if (name == "<init>" || name == "<clinit>") {
-                std::cerr << R"(The name of the method ref can't be "<init>" or "<clinit>".)"
-                          << std::endl;
+                std::cerr << R"(The name of the method ref can't be "<init>" or "<clinit>".)" << std::endl;
                 abort();
             }
         }
@@ -455,14 +450,14 @@ void VMCheck::visit_method_handle_info(ClassFile &class_file, ConstantInfo::Meth
 }
 
 // TODO: Check if the bootstrap method index if correct.
-void VMCheck::visit_dynamic_info(ClassFile &class_file, ConstantInfo::DynamicInfo &info) {
+void VMCheck::visit_dynamic_info(ClassFile& class_file, ConstantInfo::DynamicInfo& info) {
     if (!class_file.is_valid_index(info.name_and_type_index)) {
         std::cerr << "The name and type index is not a valid constant pool index." << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_module_package_info(ClassFile &class_file, ConstantInfo::ModulePackageInfo &info) {
+void VMCheck::visit_module_package_info(ClassFile& class_file, ConstantInfo::ModulePackageInfo& info) {
     if (!class_file.is_valid_index(info.name_index)) {
         std::cerr << "The name index is not a valid constant pool index." << std::endl;
         abort();

@@ -16,7 +16,7 @@ TEST(General, Works) {
     auto file = JARFile::read_file(TEST_PATH "/resources/hello_world_in.jar");
 
     VMCheck vmCheck;
-    for (auto &class_file: file.classes) {
+    for (auto& class_file : file.classes) {
         vmCheck.visit_class(class_file.second);
     }
 

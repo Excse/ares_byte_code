@@ -10,21 +10,21 @@ class Visitor {
 public:
     virtual ~Visitor() = default;
 
-    virtual void visit_class(ClassFile &class_file) = 0;
+    virtual void visit_class(ClassFile& class_file) = 0;
 
-    virtual void visit_classpool_info(ClassFile &class_file, ConstantPoolInfo &constantPoolInfo) = 0;
+    virtual void visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& constantPoolInfo) = 0;
 
-    virtual void visit_class_interface(ClassFile &class_file, uint16_t interface) = 0;
+    virtual void visit_class_interface(ClassFile& class_file, uint16_t interface) = 0;
 
-    virtual void visit_class_field(ClassFile &class_file, FieldInfo &field_info) = 0;
+    virtual void visit_class_field(ClassFile& class_file, FieldInfo& field_info) = 0;
 
-    virtual void visit_class_method(ClassFile &class_file, MethodInfo &method_info) = 0;
+    virtual void visit_class_method(ClassFile& class_file, MethodInfo& method_info) = 0;
 
-    virtual void visit_class_attribute(ClassFile &class_file, AttributeInfo &attribute_info) = 0;
+    virtual void visit_class_attribute(ClassFile& class_file, AttributeInfo& attribute_info) = 0;
 
-    virtual void visit_field_attribute(ClassFile &class_file, FieldInfo &field_info, AttributeInfo &attribute_info) = 0;
+    virtual void visit_field_attribute(ClassFile& class_file, FieldInfo& field_info, AttributeInfo& attribute_info) = 0;
 
-    virtual void visit_method_attribute(ClassFile &class_file, MethodInfo &method_info, AttributeInfo &attribute_info) = 0;
+    virtual void visit_method_attribute(ClassFile& class_file, MethodInfo& method_info, AttributeInfo& attribute_info) = 0;
 };
 
 } // namespace ares

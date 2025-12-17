@@ -10,37 +10,37 @@ namespace aresbc {
 
 class VMCheck final : Visitor {
 public:
-    void visit_class(ClassFile &class_file) override;
+    void visit_class(ClassFile& class_file) override;
 
-    void visit_classpool_info(ClassFile &class_file, ConstantPoolInfo &constantPoolInfo) override;
+    void visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& constantPoolInfo) override;
 
-    void visit_class_interface(ClassFile &class_file, uint16_t interface) override;
+    void visit_class_interface(ClassFile& class_file, uint16_t interface) override;
 
-    void visit_class_field(ClassFile &class_file, FieldInfo &field_info) override;
+    void visit_class_field(ClassFile& class_file, FieldInfo& field_info) override;
 
-    void visit_class_method(ClassFile &class_file, MethodInfo &method_info) override;
+    void visit_class_method(ClassFile& class_file, MethodInfo& method_info) override;
 
-    void visit_class_attribute(ClassFile &class_file, AttributeInfo &attribute_info) override;
+    void visit_class_attribute(ClassFile& class_file, AttributeInfo& attribute_info) override;
 
-    void visit_field_attribute(ClassFile &class_file, FieldInfo &field_info, AttributeInfo &attribute_info) override;
+    void visit_field_attribute(ClassFile& class_file, FieldInfo& field_info, AttributeInfo& attribute_info) override;
 
-    void visit_method_attribute(ClassFile &class_file, MethodInfo &method_info, AttributeInfo &attribute_info) override;
+    void visit_method_attribute(ClassFile& class_file, MethodInfo& method_info, AttributeInfo& attribute_info) override;
 
-    static void visit_class_info(aresbc::ClassFile &class_file, aresbc::ConstantInfo::ClassInfo &info);
+    static void visit_class_info(ClassFile& class_file, ConstantInfo::ClassInfo& info);
 
-    static void visit_field_method_info(aresbc::ClassFile &class_file, ConstantInfo::FieldMethodInfo &info);
+    static void visit_field_method_info(ClassFile& class_file, ConstantInfo::FieldMethodInfo& info);
 
-    static void visit_name_and_type_info(ClassFile &class_file, ConstantInfo::NameAndTypeInfo &info);
+    static void visit_name_and_type_info(ClassFile& class_file, ConstantInfo::NameAndTypeInfo& info);
 
-    static void visit_string_info(ClassFile &class_file, ConstantInfo::StringInfo &info);
+    static void visit_string_info(ClassFile& class_file, ConstantInfo::StringInfo& info);
 
-    static void visit_method_type_info(ClassFile &class_file, ConstantInfo::MethodTypeInfo &info);
+    static void visit_method_type_info(ClassFile& class_file, ConstantInfo::MethodTypeInfo& info);
 
-    static void visit_method_handle_info(ClassFile &class_file, ConstantInfo::MethodHandleInfo &info);
+    static void visit_method_handle_info(ClassFile& class_file, ConstantInfo::MethodHandleInfo& info);
 
-    static void visit_dynamic_info(ClassFile &class_file, ConstantInfo::DynamicInfo &info);
+    static void visit_dynamic_info(ClassFile& class_file, ConstantInfo::DynamicInfo& info);
 
-    static void visit_module_package_info(ClassFile &class_file, ConstantInfo::ModulePackageInfo &info);
+    static void visit_module_package_info(ClassFile& class_file, ConstantInfo::ModulePackageInfo& info);
 };
 
 } // namespace ares

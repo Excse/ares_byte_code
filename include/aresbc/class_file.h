@@ -61,18 +61,18 @@ public:
     uint16_t major_version{};
     ClassVersion class_version{};
     uint16_t constant_pool_count{};
-    std::vector <ConstantPoolInfo> constant_pool{};
+    std::vector<ConstantPoolInfo> constant_pool{};
     uint16_t access_flags{};
     uint16_t this_class{};
     uint16_t super_class{};
     uint16_t interfaces_count{};
-    std::vector <uint16_t> interfaces{};
+    std::vector<uint16_t> interfaces{};
     uint16_t fields_count{};
-    std::vector <FieldInfo> fields{};
+    std::vector<FieldInfo> fields{};
     uint16_t method_count{};
-    std::vector <MethodInfo> methods{};
+    std::vector<MethodInfo> methods{};
     uint16_t attributes_count{};
-    std::vector <AttributeInfo> attributes{};
+    std::vector<AttributeInfo> attributes{};
 };
 
 } // namespace ares

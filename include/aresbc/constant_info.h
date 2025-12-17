@@ -46,7 +46,7 @@ union ConstantInfo {
 
     struct UTF8Info {
         uint16_t length;
-        uint8_t *bytes;
+        uint8_t* bytes;
     } utf8_info;
 
     struct MethodHandleInfo {
@@ -95,7 +95,7 @@ public:
     [[nodiscard]] auto size() const -> unsigned int;
 
 public:
-    ConstantTag tag{UNDEFINED};
+    ConstantTag tag{ UNDEFINED };
     ConstantInfo info{};
 };
 

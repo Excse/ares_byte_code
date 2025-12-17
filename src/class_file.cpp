@@ -17,14 +17,18 @@ auto ClassFile::has_access_flag(AccessFlag access_flag) const -> bool {
 
 auto ClassFile::size() const -> unsigned int {
     size_t size = 24 + 2 * interfaces_count;
-    for(const auto &constant_info : constant_pool)
+    for (const auto& constant_info : constant_pool) {
         size += constant_info.size();
-    for(const auto &field_info : fields)
+    }
+    for (const auto& field_info : fields) {
         size += field_info.size();
-    for(const auto &method_info : methods)
+    }
+    for (const auto& method_info : methods) {
         size += method_info.size();
-    for(const auto &attribute_info : attributes)
+    }
+    for (const auto& attribute_info : attributes) {
         size += attribute_info.size();
+    }
     return size;
 }
 

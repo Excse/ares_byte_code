@@ -10,8 +10,9 @@ auto FieldInfo::has_access_flag(AccessFlag access_flag) const -> bool {
 
 auto FieldInfo::size() const -> unsigned int {
     size_t size = 8;
-    for(const auto &attribute : attributes)
+    for (const auto& attribute : attributes) {
         size += attribute.size();
+    }
     return size;
 }
 

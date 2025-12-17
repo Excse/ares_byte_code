@@ -15,34 +15,34 @@ namespace aresbc {
 
 class Manifest {
 public:
-    static auto read_manifest(std::string &content) -> Manifest;
+    static auto read_manifest(std::string& content) -> Manifest;
 
     [[nodiscard]] auto content() const -> std::string;
 
 public:
-    std::unordered_map <std::string, std::string> data{};
+    std::unordered_map<std::string, std::string> data{};
 };
 
 class JARFile {
 public:
-    static auto read_file(const std::filesystem::path &path) -> JARFile;
+    static auto read_file(const std::filesystem::path& path) -> JARFile;
 
-    auto write_file(const std::filesystem::path &path) -> void;
+    auto write_file(const std::filesystem::path& path) -> void;
 
 private:
-    static void _add_to_zip(zip_t *zip, const std::string &file_name, const std::vector<uint8_t> &data);
+    static void _add_to_zip(zip_t* zip, const std::string& file_name, const std::vector<uint8_t>& data);
 
 public:
-    std::unordered_map <std::string, std::vector<uint8_t>> others{};
-    std::unordered_map <std::string, ClassFile> classes{};
+    std::unordered_map<std::string, std::vector<uint8_t>> others{};
+    std::unordered_map<std::string, ClassFile> classes{};
     Manifest manifest{};
 };
 
-static void ltrim(std::string &input, std::function<int(int)> const &predicate = isspace);
+static void ltrim(std::string& input, std::function<int(int)> const& predicate = isspace);
 
-static void rtrim(std::string &input, std::function<int(int)> const &predicate = isspace);
+static void rtrim(std::string& input, std::function<int(int)> const& predicate = isspace);
 
-static void trim(std::string &input, std::function<int(int)> const &predicate = isspace);
+static void trim(std::string& input, std::function<int(int)> const& predicate = isspace);
 
 
 } // namespace ares

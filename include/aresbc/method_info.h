@@ -34,7 +34,7 @@ public:
     uint16_t name_index{};
     uint16_t descriptor_index{};
     uint16_t attributes_count{};
-    std::vector <AttributeInfo> attributes{};
+    std::vector<AttributeInfo> attributes{};
 };
 
 } // namespace ares

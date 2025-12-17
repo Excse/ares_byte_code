@@ -10,8 +10,9 @@ auto MethodInfo::has_access_flag(AccessFlag access_flag) const -> bool {
 
 auto MethodInfo::size() const -> unsigned int {
     size_t size = 8;
-    for(const auto &attribute_info : attributes)
+    for (const auto& attribute_info : attributes) {
         size += attribute_info.size();
+    }
     return size;
 }
 
