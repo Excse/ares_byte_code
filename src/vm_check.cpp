@@ -409,8 +409,7 @@ void VMCheck::visit_method_handle_info(const ClassFile& class_file, const Consta
             abort();
         }
 
-        if (constant_pool_info.tag != ConstantPoolInfo::METHOD_REF
-                   && constant_pool_info.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
+        if (constant_pool_info.tag != ConstantPoolInfo::METHOD_REF  && constant_pool_info.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
             std::cerr << "The reference index of the method handle needs to be a method ref or interface method ref." << std::endl;
             abort();
         }
