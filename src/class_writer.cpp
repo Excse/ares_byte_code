@@ -2,13 +2,14 @@
 
 #include <iostream>
 
+#include "aresbc/attribute_info.h"
 #include "aresbc/constant_info.h"
 #include "aresbc/field_info.h"
 #include "aresbc/utils.h"
 
 using namespace aresbc;
 
-ClassWriter::ClassWriter(unsigned int offset) :
+ClassWriter::ClassWriter(const unsigned int offset) :
     _offset(offset) {
 }
 
@@ -116,7 +117,8 @@ void ClassWriter::visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& 
     }
 }
 
-void ClassWriter::visit_class_interface(ClassFile&, uint16_t) { }
+void ClassWriter::visit_class_interface(ClassFile&, uint16_t) {
+}
 
 void ClassWriter::visit_class_field(ClassFile& class_file, FieldInfo& field_info) {
     write_u16(field_info.access_flags, class_file);
@@ -161,7 +163,7 @@ auto ClassWriter::byte_code() const -> const std::vector<uint8_t>& {
     return _byte_code;
 }
 
-auto ClassWriter::write_u8(uint8_t& data, ClassFile& class_file) -> bool {
+auto ClassWriter::write_u8(const uint8_t& data, const ClassFile& class_file) -> bool {
     if (_offset + 1 > class_file.byte_code.size()) {
         std::cerr << "Couldn't write u8 because it is out of bounds." << std::endl;
         return false;
@@ -172,7 +174,7 @@ auto ClassWriter::write_u8(uint8_t& data, ClassFile& class_file) -> bool {
     return true;
 }
 
-auto ClassWriter::write_u16(uint16_t& data, ClassFile& class_file) -> bool {
+auto ClassWriter::write_u16(const uint16_t& data, const ClassFile& class_file) -> bool {
     if (_offset + 2 > class_file.byte_code.size()) {
         std::cerr << "Couldn't write u16 because it is out of bounds." << std::endl;
         return false;
@@ -184,7 +186,7 @@ auto ClassWriter::write_u16(uint16_t& data, ClassFile& class_file) -> bool {
     return true;
 }
 
-auto ClassWriter::write_u32(uint32_t& data, ClassFile& class_file) -> bool {
+auto ClassWriter::write_u32(const uint32_t& data, const ClassFile& class_file) -> bool {
     if (_offset + 4 > class_file.byte_code.size()) {
         std::cerr << "Couldn't read u32 because it is out of bounds." << std::endl;
         return false;
@@ -198,7 +200,7 @@ auto ClassWriter::write_u32(uint32_t& data, ClassFile& class_file) -> bool {
     return true;
 }
 
-auto ClassWriter::write_u8_array(uint8_t* data, unsigned int data_size, ClassFile& class_file) -> bool {
+auto ClassWriter::write_u8_array(const uint8_t* data, const unsigned int data_size, const ClassFile& class_file) -> bool {
     if ((_offset + data_size) > class_file.byte_code.size()) {
         std::cerr << "Couldn't write the u8 array because it is out of bounds." << std::endl;
         return false;

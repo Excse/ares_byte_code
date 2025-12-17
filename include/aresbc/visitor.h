@@ -1,6 +1,5 @@
 #pragma once
 
-#include "attribute_info.h"
 #include "method_info.h"
 #include "class_file.h"
 

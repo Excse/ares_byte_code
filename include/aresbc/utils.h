@@ -10,6 +10,7 @@
 #include <zip.h>
 
 #include "class_file.h"
+#include "field_info.h"
 
 namespace aresbc {
 

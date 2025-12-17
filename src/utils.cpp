@@ -8,7 +8,6 @@
 
 #include "aresbc/class_reader.h"
 #include "aresbc/class_writer.h"
-#include "aresbc/field_info.h"
 
 using namespace aresbc;
 

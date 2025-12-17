@@ -19,7 +19,7 @@ using namespace aresbc;
         abort();                                                            \
     }
 
-ClassReader::ClassReader(unsigned int offset) :
+ClassReader::ClassReader(const unsigned int offset) :
     _offset(offset) {
 }
 
@@ -64,7 +64,7 @@ void ClassReader::read_class_version(ClassFile& class_file) {
 
     class_file.class_version = ClassFile::UNDEFINED;
     if (class_file.major_version >= ClassFile::VERSION_1_1 && class_file.major_version <= ClassFile::VERSION_15) {
-        class_file.class_version = ClassFile::ClassVersion(class_file.major_version);
+        class_file.class_version = static_cast<ClassFile::ClassVersion>(class_file.major_version);
     }
 }
 
@@ -88,7 +88,7 @@ void ClassReader::visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& 
     CHECKED_READ(u8, infoTag, "Couldn't read the tag.")
 
     if (infoTag >= ConstantPoolInfo::UTF_8 && infoTag <= ConstantPoolInfo::PACKAGE && infoTag != 13 && infoTag != 14) {
-        info.tag = ConstantPoolInfo::ConstantTag(infoTag);
+        info.tag = static_cast<ConstantPoolInfo::ConstantTag>(infoTag);
     } else {
         info.tag = ConstantPoolInfo::UNDEFINED;
     }
@@ -149,55 +149,55 @@ void ClassReader::visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& 
     }
 }
 
-void ClassReader::read_class_info(ClassFile& class_file, ConstantInfo::ClassInfo& info) {
+void ClassReader::read_class_info(const ClassFile& class_file, ConstantInfo::ClassInfo& info) {
     CHECKED_READ(u16, info.name_index, "Couldn't read the name index.")
 }
 
-void ClassReader::read_utf8_info(ClassFile& class_file, ConstantInfo::UTF8Info& info) {
+void ClassReader::read_utf8_info(const ClassFile& class_file, ConstantInfo::UTF8Info& info) {
     CHECKED_READ(u16, info.length, "Couldn't read the length.")
 
     info.bytes = new uint8_t[info.length];
     CHECKED_ARRAY_READ(u8, info.bytes, info.length, "Couldn't read the bytes.")
 }
 
-void ClassReader::read_field_method_info(ClassFile& class_file, ConstantInfo::FieldMethodInfo& info) {
+void ClassReader::read_field_method_info(const ClassFile& class_file, ConstantInfo::FieldMethodInfo& info) {
     CHECKED_READ(u16, info.class_index, "Couldn't read the class index.")
     CHECKED_READ(u16, info.name_and_type_index, "Couldn't read the name and type index.")
 }
 
-void ClassReader::read_name_and_type(ClassFile& class_file, ConstantInfo::NameAndTypeInfo& info) {
+void ClassReader::read_name_and_type(const ClassFile& class_file, ConstantInfo::NameAndTypeInfo& info) {
     CHECKED_READ(u16, info.name_index, "Couldn't read the name index.")
     CHECKED_READ(u16, info.descriptor_index, "Couldn't read the descriptor index.")
 }
 
-void ClassReader::read_string_info(ClassFile& class_file, ConstantInfo::StringInfo& info) {
+void ClassReader::read_string_info(const ClassFile& class_file, ConstantInfo::StringInfo& info) {
     CHECKED_READ(u16, info.string_index, "Couldn't read the string index.")
 }
 
-void ClassReader::read_double_long(ClassFile& class_file, ConstantInfo::DoubleLongInfo& info) {
+void ClassReader::read_double_long(const ClassFile& class_file, ConstantInfo::DoubleLongInfo& info) {
     CHECKED_READ(u32, info.high_bytes, "Couldn't read the high bytes.")
     CHECKED_READ(u32, info.low_bytes, "Couldn't read the low bytes.")
 }
 
-void ClassReader::read_float_integer(ClassFile& class_file, ConstantInfo::FloatIntegerInfo& info) {
+void ClassReader::read_float_integer(const ClassFile& class_file, ConstantInfo::FloatIntegerInfo& info) {
     CHECKED_READ(u32, info.bytes, "Couldn't read the bytes.")
 }
 
-void ClassReader::read_method_type(ClassFile& class_file, ConstantInfo::MethodTypeInfo& info) {
+void ClassReader::read_method_type(const ClassFile& class_file, ConstantInfo::MethodTypeInfo& info) {
     CHECKED_READ(u16, info.descriptor_index, "Couldn't read the descriptor index.")
 }
 
-void ClassReader::read_method_handle(ClassFile& class_file, ConstantInfo::MethodHandleInfo& info) {
+void ClassReader::read_method_handle(const ClassFile& class_file, ConstantInfo::MethodHandleInfo& info) {
     CHECKED_READ(u8, info.reference_kind, "Couldn't read the reference kind.")
     CHECKED_READ(u16, info.reference_index, "Couldn't read the reference index.")
 }
 
-void ClassReader::read_dynamic(ClassFile& class_file, ConstantInfo::DynamicInfo& info) {
+void ClassReader::read_dynamic(const ClassFile& class_file, ConstantInfo::DynamicInfo& info) {
     CHECKED_READ(u16, info.boostrap_method_attr_index, "Couldn't read the bootstrap method attribute index.")
     CHECKED_READ(u16, info.name_and_type_index, "Couldn't read the name and type index.")
 }
 
-void ClassReader::read_module_package(ClassFile& class_file, ConstantInfo::ModulePackageInfo& info) {
+void ClassReader::read_module_package(const ClassFile& class_file, ConstantInfo::ModulePackageInfo& info) {
     CHECKED_READ(u16, info.name_index, "Couldn't read the name index.")
 }
 
@@ -294,7 +294,7 @@ auto ClassReader::offset() const -> unsigned int {
     return _offset;
 }
 
-auto ClassReader::read_u8(uint8_t& data, ClassFile& class_file) -> bool {
+auto ClassReader::read_u8(uint8_t& data, const ClassFile& class_file) -> bool {
     if (_offset + 1 > class_file.byte_code.size()) {
         std::cerr << "Couldn't read u8 because it is out of bounds." << std::endl;
         return false;
@@ -306,7 +306,7 @@ auto ClassReader::read_u8(uint8_t& data, ClassFile& class_file) -> bool {
     return true;
 }
 
-auto ClassReader::read_u16(uint16_t& data, ClassFile& class_file) -> bool {
+auto ClassReader::read_u16(uint16_t& data, const ClassFile& class_file) -> bool {
     if (_offset + 2 > class_file.byte_code.size()) {
         std::cerr << "Couldn't read u16 because it is out of bounds." << std::endl;
         return false;
@@ -319,7 +319,7 @@ auto ClassReader::read_u16(uint16_t& data, ClassFile& class_file) -> bool {
     return true;
 }
 
-auto ClassReader::read_u32(uint32_t& data, ClassFile& class_file) -> bool {
+auto ClassReader::read_u32(uint32_t& data, const ClassFile& class_file) -> bool {
     if (_offset + 4 > class_file.byte_code.size()) {
         std::cerr << "Couldn't read u32 because it is out of bounds." << std::endl;
         return false;
@@ -334,7 +334,7 @@ auto ClassReader::read_u32(uint32_t& data, ClassFile& class_file) -> bool {
     return true;
 }
 
-auto ClassReader::read_u8_array(uint8_t* data, unsigned int length, ClassFile& class_file) -> bool {
+auto ClassReader::read_u8_array(uint8_t* data, const unsigned int length, const ClassFile& class_file) -> bool {
     if ((_offset + length) > class_file.byte_code.size()) {
         std::cerr << "Couldn't read the u8 array because it is out of bounds." << std::endl;
         return false;

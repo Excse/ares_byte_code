@@ -4,7 +4,7 @@
 
 using namespace aresbc;
 
-auto FieldInfo::has_access_flag(AccessFlag access_flag) const -> bool {
+auto FieldInfo::has_access_flag(const AccessFlag access_flag) const -> bool {
     return access_flags & access_flag;
 }
 

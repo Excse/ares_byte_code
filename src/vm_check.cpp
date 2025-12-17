@@ -17,14 +17,13 @@ void VMCheck::visit_class(ClassFile& class_file) {
         abort();
     }
 
-    if (class_file.class_version > ClassFile::VERSION_12
-        && (class_file.minor_version != 0 && class_file.minor_version != 65535)) {
+    if (class_file.class_version > ClassFile::VERSION_12 && (class_file.minor_version != 0 && class_file.minor_version != 65535)) {
         std::cerr << "All Java 12 class files need a minor version of 0 or 65535." << std::endl;
         abort();
     }
 
-    for (auto& constantPoolInfo : class_file.constant_pool) {
-        VMCheck::visit_classpool_info(class_file, constantPoolInfo);
+    for (auto& constant_pool_info : class_file.constant_pool) {
+        VMCheck::visit_classpool_info(class_file, constant_pool_info);
     }
 
     if (class_file.has_access_flag(ClassFile::INTERFACE)) {
@@ -56,8 +55,8 @@ void VMCheck::visit_class(ClassFile& class_file) {
         abort();
     }
 
-    auto thisClass = class_file.constant_pool[class_file.this_class - 1];
-    if (thisClass.tag != ConstantPoolInfo::CLASS) {
+    const auto this_class = class_file.constant_pool[class_file.this_class - 1];
+    if (this_class.tag != ConstantPoolInfo::CLASS) {
         std::cerr << "The \"this class\" is not a class constant pool info." << std::endl;
         abort();
     }
@@ -68,14 +67,14 @@ void VMCheck::visit_class(ClassFile& class_file) {
             abort();
         }
 
-        auto superClass = class_file.constant_pool[class_file.super_class - 1];
-        if (superClass.tag != ConstantPoolInfo::CLASS) {
+        const auto super_class = class_file.constant_pool[class_file.super_class - 1];
+        if (super_class.tag != ConstantPoolInfo::CLASS) {
             std::cerr << "The \"super class\" is not a class constant pool info." << std::endl;
             abort();
         }
     }
 
-    for (auto& interface : class_file.interfaces) {
+    for (const auto& interface : class_file.interfaces) {
         VMCheck::visit_class_interface(class_file, interface);
     }
 
@@ -92,14 +91,63 @@ void VMCheck::visit_class(ClassFile& class_file) {
     }
 }
 
-void VMCheck::visit_class_interface(ClassFile& class_file, uint16_t interface) {
+void VMCheck::visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& constantPoolInfo) {
+    switch (constantPoolInfo.tag) {
+        case ConstantPoolInfo::CLASS: {
+            visit_class_info(class_file, constantPoolInfo.info.class_info);
+            break;
+        }
+        case ConstantPoolInfo::FIELD_REF:
+        case ConstantPoolInfo::METHOD_REF:
+        case ConstantPoolInfo::INTERFACE_METHOD_REF: {
+            visit_field_method_info(class_file, constantPoolInfo.info.field_method_info);
+            break;
+        }
+        case ConstantPoolInfo::NAME_AND_TYPE: {
+            visit_name_and_type_info(class_file, constantPoolInfo.info.name_and_type_info);
+            break;
+        }
+        case ConstantPoolInfo::STRING: {
+            visit_string_info(class_file, constantPoolInfo.info.string_info);
+            break;
+        }
+        case ConstantPoolInfo::METHOD_TYPE: {
+            visit_method_type_info(class_file, constantPoolInfo.info.method_type_info);
+            break;
+        }
+        case ConstantPoolInfo::METHOD_HANDLE: {
+            visit_method_handle_info(class_file, constantPoolInfo.info.method_handle_info);
+            break;
+        }
+        case ConstantPoolInfo::DYNAMIC:
+        case ConstantPoolInfo::INVOKE_DYNAMIC: {
+            visit_dynamic_info(class_file, constantPoolInfo.info.dynamic_info);
+            break;
+        }
+        case ConstantPoolInfo::MODULE:
+        case ConstantPoolInfo::PACKAGE: {
+            visit_module_package_info(class_file, constantPoolInfo.info.module_package_info);
+            break;
+        }
+        case ConstantPoolInfo::UTF_8:
+        case ConstantPoolInfo::INTEGER:
+        case ConstantPoolInfo::FLOAT:
+        case ConstantPoolInfo::LONG:
+        case ConstantPoolInfo::DOUBLE:
+        case ConstantPoolInfo::UNDEFINED: {
+            break;
+        }
+    }
+}
+
+void VMCheck::visit_class_interface(ClassFile& class_file, const uint16_t interface) {
     if (!class_file.is_valid_index(interface)) {
         std::cerr << "The interface index is not a valid constant pool index." << std::endl;
         abort();
     }
 
-    auto constantPoolInfo = class_file.constant_pool[interface - 1];
-    if (constantPoolInfo.tag != ConstantPoolInfo::CLASS) {
+    const auto constant_pool_info = class_file.constant_pool[interface - 1];
+    if (constant_pool_info.tag != ConstantPoolInfo::CLASS) {
         std::cerr << "The interface is not a class constant pool info." << std::endl;
         abort();
     }
@@ -136,8 +184,8 @@ void VMCheck::visit_class_field(ClassFile& class_file, FieldInfo& field_info) {
         abort();
     }
 
-    auto fieldName = class_file.constant_pool[field_info.name_index - 1];
-    if (fieldName.tag != ConstantPoolInfo::UTF_8) {
+    const auto field_name = class_file.constant_pool[field_info.name_index - 1];
+    if (field_name.tag != ConstantPoolInfo::UTF_8) {
         std::cerr << "The name is not a utf8 class pool info." << std::endl;
         abort();
     }
@@ -147,8 +195,8 @@ void VMCheck::visit_class_field(ClassFile& class_file, FieldInfo& field_info) {
         abort();
     }
 
-    auto fieldDescriptor = class_file.constant_pool[field_info.descriptor_index - 1];
-    if (fieldDescriptor.tag != ConstantPoolInfo::UTF_8) {
+    const auto field_descriptor = class_file.constant_pool[field_info.descriptor_index - 1];
+    if (field_descriptor.tag != ConstantPoolInfo::UTF_8) {
         std::cerr << "The descriptor is not a utf8 class pool info." << std::endl;
         abort();
     }
@@ -222,14 +270,14 @@ void VMCheck::visit_class_method(ClassFile& class_file, MethodInfo& method_info)
         abort();
     }
 
-    auto methodName = class_file.constant_pool[method_info.name_index - 1];
-    if (methodName.tag != ConstantPoolInfo::UTF_8) {
+    const auto method_name = class_file.constant_pool[method_info.name_index - 1];
+    if (method_name.tag != ConstantPoolInfo::UTF_8) {
         std::cerr << "The name index is not a utf8 constant pool info." << std::endl;
         abort();
     }
 
     std::string name;
-    name.assign(reinterpret_cast<char*>(methodName.info.utf8_info.bytes), methodName.info.utf8_info.length);
+    name.assign(reinterpret_cast<char*>(method_name.info.utf8_info.bytes), method_name.info.utf8_info.length);
     if (name == "<init>") {
         if (method_info.has_access_flag(MethodInfo::ABSTRACT)
             || method_info.has_access_flag(MethodInfo::NATIVE)
@@ -248,8 +296,8 @@ void VMCheck::visit_class_method(ClassFile& class_file, MethodInfo& method_info)
         abort();
     }
 
-    auto methodDescriptor = class_file.constant_pool[method_info.descriptor_index - 1];
-    if (methodDescriptor.tag != ConstantPoolInfo::UTF_8) {
+    const auto method_descriptor = class_file.constant_pool[method_info.descriptor_index - 1];
+    if (method_descriptor.tag != ConstantPoolInfo::UTF_8) {
         std::cerr << "The name index is not a utf8 constant pool info." << std::endl;
         abort();
     }
@@ -265,8 +313,8 @@ void VMCheck::visit_class_attribute(ClassFile& class_file, AttributeInfo& attrib
         abort();
     }
 
-    auto attributeName = class_file.constant_pool[attribute_info.attribute_name_index - 1];
-    if (attributeName.tag != ConstantPoolInfo::UTF_8) {
+    const auto attribute_name = class_file.constant_pool[attribute_info.attribute_name_index - 1];
+    if (attribute_name.tag != ConstantPoolInfo::UTF_8) {
         std::cerr << "The name index is not a utf8 class pool info." << std::endl;
         abort();
     }
@@ -280,65 +328,14 @@ void VMCheck::visit_method_attribute(ClassFile& class_file, MethodInfo&, Attribu
     VMCheck::visit_class_attribute(class_file, attribute_info);
 }
 
-void VMCheck::visit_classpool_info(ClassFile& class_file, ConstantPoolInfo& constantPoolInfo) {
-    switch (constantPoolInfo.tag) {
-        case ConstantPoolInfo::CLASS: {
-            VMCheck::visit_class_info(class_file, constantPoolInfo.info.class_info);
-            break;
-        }
-        case ConstantPoolInfo::FIELD_REF:
-        case ConstantPoolInfo::METHOD_REF:
-        case ConstantPoolInfo::INTERFACE_METHOD_REF: {
-            VMCheck::visit_field_method_info(class_file, constantPoolInfo.info.field_method_info);
-            break;
-        }
-        case ConstantPoolInfo::NAME_AND_TYPE: {
-            VMCheck::visit_name_and_type_info(class_file, constantPoolInfo.info.name_and_type_info);
-            break;
-        }
-        case ConstantPoolInfo::STRING: {
-            VMCheck::visit_string_info(class_file, constantPoolInfo.info.string_info);
-            break;
-        }
-        case ConstantPoolInfo::METHOD_TYPE: {
-            VMCheck::visit_method_type_info(class_file, constantPoolInfo.info.method_type_info);
-            break;
-        }
-        case ConstantPoolInfo::METHOD_HANDLE: {
-            VMCheck::visit_method_handle_info(class_file, constantPoolInfo.info.method_handle_info);
-            break;
-        }
-        case ConstantPoolInfo::DYNAMIC:
-        case ConstantPoolInfo::INVOKE_DYNAMIC: {
-            VMCheck::visit_dynamic_info(class_file, constantPoolInfo.info.dynamic_info);
-            break;
-        }
-        case ConstantPoolInfo::MODULE:
-        case ConstantPoolInfo::PACKAGE: {
-            VMCheck::visit_module_package_info(class_file, constantPoolInfo.info.module_package_info);
-            break;
-        }
-        case ConstantPoolInfo::UTF_8:
-        case ConstantPoolInfo::INTEGER:
-        case ConstantPoolInfo::FLOAT:
-        case ConstantPoolInfo::LONG:
-        case ConstantPoolInfo::DOUBLE: {
-            break;
-        }
-        case ConstantPoolInfo::UNDEFINED: {
-            break;
-        }
-    }
-}
-
-void VMCheck::visit_class_info(ClassFile& class_file, ConstantInfo::ClassInfo& info) {
+void VMCheck::visit_class_info(const ClassFile& class_file, const ConstantInfo::ClassInfo& info) {
     if (!class_file.is_valid_index(info.name_index)) {
         std::cout << "The name index is not a valid constant pool index." << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_field_method_info(ClassFile& class_file, ConstantInfo::FieldMethodInfo& info) {
+void VMCheck::visit_field_method_info(const ClassFile& class_file, const ConstantInfo::FieldMethodInfo& info) {
     if (!class_file.is_valid_index(info.class_index)) {
         std::cerr << "The class index is not a valid constant pool index." << std::endl;
         abort();
@@ -350,7 +347,7 @@ void VMCheck::visit_field_method_info(ClassFile& class_file, ConstantInfo::Field
     }
 }
 
-void VMCheck::visit_name_and_type_info(ClassFile& class_file, ConstantInfo::NameAndTypeInfo& info) {
+void VMCheck::visit_name_and_type_info(const ClassFile& class_file, const ConstantInfo::NameAndTypeInfo& info) {
     if (!class_file.is_valid_index(info.name_index)) {
         std::cerr << "The name index is not a valid constant pool index." << std::endl;
         abort();
@@ -362,21 +359,21 @@ void VMCheck::visit_name_and_type_info(ClassFile& class_file, ConstantInfo::Name
     }
 }
 
-void VMCheck::visit_string_info(ClassFile& class_file, ConstantInfo::StringInfo& info) {
+void VMCheck::visit_string_info(const ClassFile& class_file, const ConstantInfo::StringInfo& info) {
     if (!class_file.is_valid_index(info.string_index)) {
         std::cerr << "The string index is not a valid constant pool index." << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_method_type_info(ClassFile& class_file, ConstantInfo::MethodTypeInfo& info) {
+void VMCheck::visit_method_type_info(const ClassFile& class_file, const ConstantInfo::MethodTypeInfo& info) {
     if (!class_file.is_valid_index(info.descriptor_index)) {
         std::cerr << "The descriptor index is not a valid constant pool index" << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_method_handle_info(ClassFile& class_file, ConstantInfo::MethodHandleInfo& info) {
+void VMCheck::visit_method_handle_info(const ClassFile& class_file, const ConstantInfo::MethodHandleInfo& info) {
     if (info.reference_kind < 1 || info.reference_kind > 9) {
         std::cerr << "The reference kind is not in range of 0 to 9." << std::endl;
         abort();
@@ -387,62 +384,62 @@ void VMCheck::visit_method_handle_info(ClassFile& class_file, ConstantInfo::Meth
         abort();
     }
 
-    auto constantPoolInfo = class_file.constant_pool[info.reference_index - 1];
-    auto referenceKind = info.reference_kind;
+    const auto constant_pool_info = class_file.constant_pool[info.reference_index - 1];
+    const auto reference_kind = info.reference_kind;
 
-    if (referenceKind == ConstantInfo::MethodHandleKind::GetField
-        || referenceKind == ConstantInfo::MethodHandleKind::GetStatic
-        || referenceKind == ConstantInfo::MethodHandleKind::PutField
-        || referenceKind == ConstantInfo::MethodHandleKind::PutStatic) {
-        if (constantPoolInfo.tag != ConstantPoolInfo::FIELD_REF) {
+    if (reference_kind == ConstantInfo::MethodHandleKind::GetField
+        || reference_kind == ConstantInfo::MethodHandleKind::GetStatic
+        || reference_kind == ConstantInfo::MethodHandleKind::PutField
+        || reference_kind == ConstantInfo::MethodHandleKind::PutStatic) {
+        if (constant_pool_info.tag != ConstantPoolInfo::FIELD_REF) {
             std::cerr << "The reference index of the method handle needs to be a field ref." << std::endl;
             abort();
         }
-    } else if (referenceKind == ConstantInfo::MethodHandleKind::InvokeVirtual
-               || referenceKind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
-        if (constantPoolInfo.tag != ConstantPoolInfo::FIELD_REF) {
+    } else if (reference_kind == ConstantInfo::MethodHandleKind::InvokeVirtual
+               || reference_kind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
+        if (constant_pool_info.tag != ConstantPoolInfo::FIELD_REF) {
             std::cerr << "The reference index of the method handle needs to be a method ref." << std::endl;
             abort();
         }
-    } else if (referenceKind == ConstantInfo::MethodHandleKind::InvokeStatic
-               || referenceKind == ConstantInfo::MethodHandleKind::InvokeSpecial) {
+    } else if (reference_kind == ConstantInfo::MethodHandleKind::InvokeStatic
+               || reference_kind == ConstantInfo::MethodHandleKind::InvokeSpecial) {
         if (class_file.class_version < ClassFile::VERSION_8
-            && constantPoolInfo.tag != ConstantPoolInfo::METHOD_REF) {
+            && constant_pool_info.tag != ConstantPoolInfo::METHOD_REF) {
             std::cerr << "The reference index of the method handle needs to be a method ref." << std::endl;
             abort();
-        } else if (constantPoolInfo.tag != ConstantPoolInfo::METHOD_REF
-                   && constantPoolInfo.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
+        }
+
+        if (constant_pool_info.tag != ConstantPoolInfo::METHOD_REF
+                   && constant_pool_info.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
             std::cerr << "The reference index of the method handle needs to be a method ref or interface method ref." << std::endl;
             abort();
         }
-    } else if (referenceKind == ConstantInfo::MethodHandleKind::InvokeInterface) {
-        if (constantPoolInfo.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
+    } else if (reference_kind == ConstantInfo::MethodHandleKind::InvokeInterface) {
+        if (constant_pool_info.tag != ConstantPoolInfo::INTERFACE_METHOD_REF) {
             std::cerr << "The reference index of the method handle needs to be a interface method ref." << std::endl;
             abort();
         }
     }
 
-    if (referenceKind == ConstantInfo::MethodHandleKind::InvokeVirtual
-        || referenceKind == ConstantInfo::MethodHandleKind::InvokeStatic
-        || referenceKind == ConstantInfo::MethodHandleKind::InvokeSpecial
-        || referenceKind == ConstantInfo::MethodHandleKind::InvokeInterface
-        || referenceKind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
-        auto nameAndType = class_file.constant_pool[
-            constantPoolInfo.info.field_method_info.name_and_type_index - 1];
-        auto nameUTF8 = class_file.constant_pool[
-            nameAndType.info.name_and_type_info.name_index - 1];
+    if (reference_kind == ConstantInfo::MethodHandleKind::InvokeVirtual
+        || reference_kind == ConstantInfo::MethodHandleKind::InvokeStatic
+        || reference_kind == ConstantInfo::MethodHandleKind::InvokeSpecial
+        || reference_kind == ConstantInfo::MethodHandleKind::InvokeInterface
+        || reference_kind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
+        const auto name_and_type = class_file.constant_pool[constant_pool_info.info.field_method_info.name_and_type_index - 1];
+        const auto name_utf8 = class_file.constant_pool[name_and_type.info.name_and_type_info.name_index - 1];
 
         std::string name;
-        name.assign(reinterpret_cast<char*>(nameUTF8.info.utf8_info.bytes), nameUTF8.info.utf8_info.length);
+        name.assign(reinterpret_cast<char*>(name_utf8.info.utf8_info.bytes), name_utf8.info.utf8_info.length);
 
-        if (referenceKind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
+        if (reference_kind == ConstantInfo::MethodHandleKind::NewInvokeSpecial) {
             if (name != "<init>") {
                 std::cerr << "The name of the method ref must be \"<init>\"" << std::endl;
                 abort();
             }
         } else {
             if (name == "<init>" || name == "<clinit>") {
-                std::cerr << R"(The name of the method ref can't be "<init>" or "<clinit>".)" << std::endl;
+                std::cerr << "The name of the method ref can't be \"<init>\" or \"<clinit>\"." << std::endl;
                 abort();
             }
         }
@@ -450,14 +447,14 @@ void VMCheck::visit_method_handle_info(ClassFile& class_file, ConstantInfo::Meth
 }
 
 // TODO: Check if the bootstrap method index if correct.
-void VMCheck::visit_dynamic_info(ClassFile& class_file, ConstantInfo::DynamicInfo& info) {
+void VMCheck::visit_dynamic_info(const ClassFile& class_file, const ConstantInfo::DynamicInfo& info) {
     if (!class_file.is_valid_index(info.name_and_type_index)) {
         std::cerr << "The name and type index is not a valid constant pool index." << std::endl;
         abort();
     }
 }
 
-void VMCheck::visit_module_package_info(ClassFile& class_file, ConstantInfo::ModulePackageInfo& info) {
+void VMCheck::visit_module_package_info(const ClassFile& class_file, const ConstantInfo::ModulePackageInfo& info) {
     if (!class_file.is_valid_index(info.name_index)) {
         std::cerr << "The name index is not a valid constant pool index." << std::endl;
         abort();

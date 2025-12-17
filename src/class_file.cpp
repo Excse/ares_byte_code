@@ -7,11 +7,11 @@
 
 using namespace aresbc;
 
-auto ClassFile::is_valid_index(unsigned int index) const -> bool {
+auto ClassFile::is_valid_index(const unsigned int index) const -> bool {
     return index > 0 && index < constant_pool_count;
 }
 
-auto ClassFile::has_access_flag(AccessFlag access_flag) const -> bool {
+auto ClassFile::has_access_flag(const AccessFlag access_flag) const -> bool {
     return access_flags & access_flag;
 }
 

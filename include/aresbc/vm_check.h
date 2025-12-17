@@ -26,21 +26,21 @@ public:
 
     void visit_method_attribute(ClassFile& class_file, MethodInfo& method_info, AttributeInfo& attribute_info) override;
 
-    static void visit_class_info(ClassFile& class_file, ConstantInfo::ClassInfo& info);
+    static void visit_class_info(const ClassFile& class_file, const ConstantInfo::ClassInfo& info);
 
-    static void visit_field_method_info(ClassFile& class_file, ConstantInfo::FieldMethodInfo& info);
+    static void visit_field_method_info(const ClassFile& class_file, const ConstantInfo::FieldMethodInfo& info);
 
-    static void visit_name_and_type_info(ClassFile& class_file, ConstantInfo::NameAndTypeInfo& info);
+    static void visit_name_and_type_info(const ClassFile& class_file, const ConstantInfo::NameAndTypeInfo& info);
 
-    static void visit_string_info(ClassFile& class_file, ConstantInfo::StringInfo& info);
+    static void visit_string_info(const ClassFile& class_file, const ConstantInfo::StringInfo& info);
 
-    static void visit_method_type_info(ClassFile& class_file, ConstantInfo::MethodTypeInfo& info);
+    static void visit_method_type_info(const ClassFile& class_file, const ConstantInfo::MethodTypeInfo& info);
 
-    static void visit_method_handle_info(ClassFile& class_file, ConstantInfo::MethodHandleInfo& info);
+    static void visit_method_handle_info(const ClassFile& class_file, const ConstantInfo::MethodHandleInfo& info);
 
-    static void visit_dynamic_info(ClassFile& class_file, ConstantInfo::DynamicInfo& info);
+    static void visit_dynamic_info(const ClassFile& class_file, const ConstantInfo::DynamicInfo& info);
 
-    static void visit_module_package_info(ClassFile& class_file, ConstantInfo::ModulePackageInfo& info);
+    static void visit_module_package_info(const ClassFile& class_file, const ConstantInfo::ModulePackageInfo& info);
 };
 
 } // namespace ares
