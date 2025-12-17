@@ -20,14 +20,9 @@ Download the project or use git to clone it:
 $ git clone https://github.com/Excse/AresByteCode.git
 ```
 
-Install libzip (if not already on the system) to enable the building of the library.
-```sh
-$ sudo apt install libzip-dev
-```
-
 Navigate to the directory where the project is located and execute these commands:
 ```sh
-$ cmake -S . -B build -DBUILD_TESTING=OFF
+$ cmake -S . -B build -DBUILD_TESTING=OFF -DMAKE_INSTALLABLE=ON -DBUILD_SHARED_LIBS=OFF
 $ cmake --build build
 $ cmake --install build
 $ sudo make install
@@ -40,5 +35,5 @@ and in CMakeLists.txt:
 ```cmake
 find_package(aresbc CONFIG REQUIRED)
 
-target_link_libraries(!!PROJECT_NAME!! PRIVATE ${LIBARESBC_LIBRARY})
+target_link_libraries(<PROJECT_NAME> PRIVATE aresbc::aresbc)
 ```
