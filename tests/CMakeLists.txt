@@ -23,7 +23,7 @@ file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ./*.cpp)
 # Define test executable
 add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES})
 # Link the test binary with the main library and GoogleTest
-target_link_libraries(${PROJECT_NAME}_tests PRIVATE ${PROJECT_NAME} gtest_main)
+target_link_libraries(${PROJECT_NAME}_tests PRIVATE ${PROJECT_NAME} libzip::zip gtest_main)
 # Set the TEST_PATH variable
 target_compile_definitions(${PROJECT_NAME}_tests PRIVATE TEST_PATH="${CMAKE_SOURCE_DIR}/tests")
 # Automatically discover and register tests with CTest

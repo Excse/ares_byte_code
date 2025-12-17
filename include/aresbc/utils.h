@@ -1,5 +1,7 @@
 #pragma once
 
+#include <filesystem>
+#include <functional>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -23,9 +25,9 @@ public:
 
 class JARFile {
 public:
-    static auto read_file(const std::string &path) -> JARFile;
+    static auto read_file(const std::filesystem::path &path) -> JARFile;
 
-    auto write_file(const std::string &path) -> void;
+    auto write_file(const std::filesystem::path &path) -> void;
 
 private:
     static void _add_to_zip(zip_t *zip, const std::string &file_name, const std::vector<uint8_t> &data);
@@ -35,6 +37,13 @@ public:
     std::unordered_map <std::string, ClassFile> classes{};
     Manifest manifest{};
 };
+
+static void ltrim(std::string &input, std::function<int(int)> const &predicate = isspace);
+
+static void rtrim(std::string &input, std::function<int(int)> const &predicate = isspace);
+
+static void trim(std::string &input, std::function<int(int)> const &predicate = isspace);
+
 
 } // namespace ares
 

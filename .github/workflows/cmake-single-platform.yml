@@ -9,9 +9,8 @@ on:
 
 env:
   BUILD_TYPE: Release
-  BUILD_SHARED_LIBS: ON
-  MAKE_INSTALLABLE: OFF
-  BUILD_EXECUTABLE: ON
+  BUILD_SHARED_LIBS: OFF
+  MAKE_INSTALLABLE: ON
   BUILD_TESTING: ON
 
 jobs:
@@ -19,17 +18,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install Dependencies
-      run: sudo apt-get update && sudo apt-get install -y cmake ninja-build libzip-dev zip libboost-all-dev
-      
-    - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -G Ninja -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTING=${{env.BUILD_TESTING}} -DBUILD_EXECUTABLE=${{env.BUILD_EXECUTABLE}} -DMAKE_INSTALLABLE=${{env.MAKE_INSTALLABLE}} -DBUILD_SHARED_LIBS=${{env.BUILD_SHARED_LIBS}}
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '4.2.x'
 
-    - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -- -j2
+      - name: Configure CMake
+        run: |
+          cmake -S . -B ${{github.workspace}}/build                  \
+          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}                     \
+          -DBUILD_TESTING=${{env.BUILD_TESTING}}                     \
+          -DMAKE_INSTALLABLE=${{env.MAKE_INSTALLABLE}}               \
+          -DBUILD_SHARED_LIBS=${{env.BUILD_SHARED_LIBS}}             \
+          -DCMAKE_INSTALL_PREFIX:PATH=$GITHUB_WORKSPACE/test_install \
+          -DFETCHCONTENT_UPDATES_DISCONNECTED=ON
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        run: cmake --build . --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
+
+      - name: Test Install
+        working-directory: ${{github.workspace}}/build
+        run: cmake --install . --config ${{env.BUILD_TYPE}}

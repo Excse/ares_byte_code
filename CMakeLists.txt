@@ -1,11 +1,6 @@
 ### --- Project Initialization and Configuration --- ###
-cmake_minimum_required(VERSION 3.20) # Require CMake 3.20 or later
-project(aresbc LANGUAGES CXX)        # Define project name and language
-
-set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 1)
-set(PROJECT_VERSION_PATCH 0)
-set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
+cmake_minimum_required(VERSION 4.2)               # Require CMake 4.2 or later
+project(aresbc VERSION 1.0.0 LANGUAGES CXX) # Define project name, version, and language
 
 set(PROJECT_DESCRIPTION "AresByteCode is a library to interact with java bytecode and provides also utils to load/write jar files.")
 
@@ -18,7 +13,8 @@ option(BUILD_TESTING "Enable testing" ON)
 # Option to enable/disable installation:
 option(MAKE_INSTALLABLE "Make the library installable" ON)
 # Option to control static vs shared library
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
 
 ### --- CMake Modules for Installation and Fetching --- ###
 include(CMakePackageConfigHelpers) # Helper for creating config files for package managers
@@ -26,14 +22,34 @@ include(GNUInstallDirs)            # Define standard install directories (lib, i
 include(FetchContent)              # For downloading and using external dependencies
 
 ### --- LibZip --- ###
-set(LIBZIP_DO_INSTALL OFF CACHE BOOL "Disable install for libzip")
-set(BUILD_REGRESS OFF CACHE BOOL "Disable regression tests")
-# You need to have libzip installed. E.g. via sudo apt-get install libzip-dev
-find_package(libzip CONFIG REQUIRED)
 
-### --- Boost --- ###
-# You need to have boost installed. E.g. via sudo apt-get install libboost-all-dev
-find_package(Boost CONFIG REQUIRED)
+set(LIBZIP_DO_INSTALL OFF CACHE BOOL "" FORCE)
+
+set(ENABLE_COMMONCRYPTO OFF CACHE BOOL "" FORCE)
+set(ENABLE_GNUTLS OFF CACHE BOOL "" FORCE)
+set(ENABLE_MBEDTLS OFF CACHE BOOL "" FORCE)
+set(ENABLE_OPENSSL OFF CACHE BOOL "" FORCE)
+set(ENABLE_WINDOWS_CRYPTO OFF CACHE BOOL "" FORCE)
+set(ENABLE_BZIP2 OFF CACHE BOOL "" FORCE)
+set(ENABLE_LZMA OFF CACHE BOOL "" FORCE)
+set(ENABLE_ZSTD OFF CACHE BOOL "" FORCE)
+set(ENABLE_FDOPEN OFF CACHE BOOL "" FORCE)
+set(ENABLE_COVERAGE OFF CACHE BOOL "" FORCE)
+
+set(BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(BUILD_REGRESS OFF CACHE BOOL "" FORCE)
+set(BUILD_OSSFUZZ OFF CACHE BOOL "" FORCE)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_DOC OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    libzip
+    GIT_REPOSITORY https://github.com/nih-at/libzip.git
+    GIT_TAG v1.11.4
+)
+
+FetchContent_MakeAvailable(libzip)
+
 
 ### --- Define Library Target --- ##
 
@@ -50,8 +66,8 @@ add_library(${PROJECT_NAME}
         src/vm_check.cpp)
 # Create an alias for the library: your_project::your_project
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-# Link both boost and libzip to the library
-target_link_libraries(${PROJECT_NAME} PRIVATE zip Boost::boost)
+# Link libzip to the library
+target_link_libraries(${PROJECT_NAME} PRIVATE libzip::zip)
 
 # Setup include directories for consumers and installers
 target_include_directories(
@@ -84,6 +100,9 @@ set_target_properties(${PROJECT_NAME}
 ### --- Install Rules --- ###
 
 if(MAKE_INSTALLABLE)
+    # Remove private deps from install interface
+    set_property(TARGET ${PROJECT_NAME} PROPERTY INTERFACE_LINK_LIBRARIES "")
+
     # Install the library and its headers
     install(TARGETS ${PROJECT_NAME}
             EXPORT ${PROJECT_NAME}Targets

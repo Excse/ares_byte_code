@@ -2,9 +2,9 @@
 
 #include <filesystem>
 #include <algorithm>
+#include <cassert>
+#include <cstring>
 #include <iostream>
-
-#include <boost/algorithm/string.hpp>
 
 #include "aresbc/class_reader.h"
 #include "aresbc/class_writer.h"
@@ -14,8 +14,8 @@ using namespace aresbc;
 
 auto Manifest::content() const -> std::string {
     std::stringstream content;
-    for (const auto &line: data) {
-        content << line.first << ": " << line.second << std::endl;
+    for (const auto & [key, value]: data) {
+        content << key << ": " << value << std::endl;
     }
     return content.str();
 }
@@ -26,24 +26,18 @@ auto Manifest::read_manifest(std::string &content) -> Manifest {
 
     Manifest manifest;
     while (std::getline(stream, line)) {
-        boost::algorithm::trim(line);
+        trim(line);
 
         // Ignore comments and empty lines
         if (line.empty() || line[0] == '#') continue;
 
-        std::vector<std::string> tokens;
-        boost::split(tokens, line, boost::is_any_of(":"), boost::token_compress_on);
+        const auto pos = line.find(':');
+        if (pos == std::string::npos) continue;
 
-        // Skip malformed lines without a key-value pair
-        if (tokens.size() < 2) continue;
-
-        auto key = tokens[0];
-        boost::algorithm::trim(key);
+        std::string key = line.substr(0, pos);
+        std::string value = line.substr(pos + 1);
 
         if (key.empty()) continue;
-
-        auto value = tokens[1];
-        boost::algorithm::trim(value);
 
         manifest.data.emplace(std::move(key), std::move(value));
     }
@@ -51,8 +45,8 @@ auto Manifest::read_manifest(std::string &content) -> Manifest {
     return manifest;
 }
 
-auto JARFile::read_file(const std::string &path) -> JARFile {
-    if (!boost::algorithm::iends_with(path, ".jar")) {
+auto JARFile::read_file(const std::filesystem::path &path) -> JARFile {
+    if (path.extension() != ".jar") {
         throw std::invalid_argument("Warning: You can only enter \".jar\" files.");
     }
 
@@ -99,7 +93,7 @@ auto JARFile::read_file(const std::string &path) -> JARFile {
         if (name == "META-INF/MANIFEST.MF") {
             auto content = std::string(reinterpret_cast<char *>(data.data()), stat.size);
             jar_file.manifest = Manifest::read_manifest(content);
-        } else if (boost::algorithm::iends_with(name, ".class")) {
+        } else if (name.ends_with(".class")) {
             ClassFile class_file;
             class_file.byte_code = std::move(data);
 
@@ -118,8 +112,8 @@ auto JARFile::read_file(const std::string &path) -> JARFile {
     return jar_file;
 }
 
-auto JARFile::write_file(const std::string &path) -> void {
-    if (!boost::algorithm::iends_with(path, ".jar")) {
+auto JARFile::write_file(const std::filesystem::path &path) -> void {
+    if (path.extension() != ".jar") {
         throw std::runtime_error("Warning: You can only enter \".jar\" files.");
     }
 
@@ -133,26 +127,26 @@ auto JARFile::write_file(const std::string &path) -> void {
     if (!zip) {
         zip_error_t zip_error;
         zip_error_init_with_code(&zip_error, error);
-        std::string error_message = zip_error_strerror(&zip_error);
+        const std::string error_message = zip_error_strerror(&zip_error);
         zip_error_fini(&zip_error);
 
         throw std::runtime_error("Warning: Couldn't create the ZIP File: " + error_message);
     }
 
-    for (auto &class_file: classes) {
+    for (auto & [file_name, data]: classes) {
         ClassWriter writer;
-        writer.visit_class(class_file.second);
+        writer.visit_class(data);
 
         auto &byte_code = writer.byte_code();
-        _add_to_zip(zip, class_file.first, byte_code);
+        _add_to_zip(zip, file_name, byte_code);
     }
 
-    for (auto &item: others) {
-        _add_to_zip(zip, item.first, item.second);
+    for (auto & [file_name, data]: others) {
+        _add_to_zip(zip, file_name, data);
     }
 
     auto manifest_content = manifest.content();
-    std::vector<uint8_t> content(manifest_content.begin(), manifest_content.end());
+    const std::vector<uint8_t> content(manifest_content.begin(), manifest_content.end());
 
     _add_to_zip(zip, "META-INF/MANIFEST.MF", content);
 
@@ -171,16 +165,29 @@ void JARFile::_add_to_zip(zip_t *zip, const std::string &file_name, const std::v
 
     zip_source_t *source = zip_source_buffer(zip, data_copy, data.size(), 0);
     if (!source) {
-        std::string error_message = zip_strerror(zip);
+        const std::string error_message = zip_strerror(zip);
         throw std::runtime_error("Warning: Error creating source: " + error_message);
     }
 
     if (zip_file_add(zip, file_name.c_str(), source, ZIP_FL_OVERWRITE) < 0) {
         zip_source_free(source);
 
-        std::string error_message = zip_strerror(zip);
+        const std::string error_message = zip_strerror(zip);
         throw std::runtime_error("Warning: Error adding file to zip: " + error_message);
     }
+}
+
+void aresbc::ltrim(std::string& input, std::function<int(int)> const& predicate) {
+    input.erase(input.begin(), std::ranges::find_if_not(input, predicate));
+}
+
+void aresbc::rtrim(std::string& input, std::function<int(int)> const& predicate) {
+    input.erase((std::find_if_not(input.rbegin(), input.rend(), predicate)).base(), input.end());
+}
+
+void aresbc::trim(std::string& input, std::function<int(int)> const& predicate) {
+    ltrim(input, predicate);
+    rtrim(input, predicate);
 }
 
 //==============================================================================

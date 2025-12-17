@@ -20,6 +20,11 @@ Download the project or use git to clone it:
 $ git clone https://github.com/Excse/AresByteCode.git
 ```
 
+Install libzip (if not already on the system) to enable the building of the library.
+```sh
+$ sudo apt install libzip-dev
+```
+
 Navigate to the directory where the project is located and execute these commands:
 ```sh
 $ cmake -S . -B build -DBUILD_TESTING=OFF
